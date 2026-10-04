@@ -47,6 +47,11 @@
 		</dl>
 
 		<dl>
+			<dt><label for="rt_announcements_first">{{ lang('RT_ANNOUNCEMENTS_FIRST') }}</label><br /><span>{{ lang('RT_ANNOUNCEMENTS_FIRST_EXP') }}</span></dt>
+			<dd><input type="checkbox" name="rt_announcements_first" id="rt_announcements_first" value="1"{% if RT_ANNOUNCEMENTS_FIRST %} checked="checked"{% endif %} /></dd>
+		</dl>
+
+		<dl>
 			<dt><label for="rt_anti_topics">{{ lang('RT_ANTI_TOPICS') }}{{ lang('COLON') }}</label><br /><span>{{ lang('RT_ANTI_TOPICS_EXP') }}</span></dt>
 			<dd><input type="text" id="rt_anti_topics" name="rt_anti_topics" size="30" value="{{ RT_ANTI_TOPICS }}" /></dd>
 		</dl>

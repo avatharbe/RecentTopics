@@ -44,6 +44,7 @@ tests/
 ├── controller/
 │   └── page_controller_test.php   Dedicated /rt and /rt/simple page controller
 ├── core/
+│   ├── announcements_first_test.php   ACP "Show announcements first" setting
 │   ├── forum_list_test.php        Which forums the list may draw topics from
 │   ├── topic_count_test.php       "Show all pages" count uses the forum list
 │   ├── topic_likes_test.php       ACP "Show like counts" setting
@@ -241,7 +242,22 @@ It reads the template and the image straight from disk.
 
 ---
 
-## 10. Functional tests (`functional/recenttopics_test.php`)
+## 10. Announcements first (`core/announcements_first_test.php`)
+
+**What this code does:**
+With the ACP setting "Show announcements first" (`rt_announcements_first`) on, `fill_template()` moves the announcements and global announcements on the current page to the top of that page. Only rows already on the page move, so old announcements never come back into the list; stickies stay with the normal topics.
+
+**What this test file does:**
+It runs `fill_template()` on one page of four topics in time order (normal, announcement, sticky, global announcement) and records the order in which they reach `assign_block_vars()`.
+
+| Test | Scenario | What it verifies |
+|------|----------|-----------------|
+| `test_announcements_lead_the_page_when_setting_is_on` | Setting on | Order is announcement, global announcement, normal, sticky: announcements first in their time order, the rest unchanged (#201) |
+| `test_page_keeps_time_order_when_setting_is_off` | Setting off (default) | Order is unchanged |
+
+---
+
+## 11. Functional tests (`functional/recenttopics_test.php`)
 
 **What this code does:**
 These tests start a real phpBB installation (using the test framework's built-in install), enable the extension, and make HTTP requests using a real browser-like crawler (Symfony DomCrawler). They check the actual rendered HTML for specific elements.
@@ -258,6 +274,8 @@ Logs in as the admin account, optionally creates topics or changes config values
 | `test_rt_page_disabled` | `rt_page_enable` = 0; GET `/app.php/rt` | Page still loads (no 500 error); `<a id="recent-topics">` is present; `#recent-topics-box` must NOT appear |
 | `test_index_has_recent_topics` | `rt_index` = 1; create a topic; GET `index.php` | `<a id="recent-topics">` is present; `#recent-topics-box` contains the created topic title |
 | `test_acp_patreon_button_is_local` | Logged in as admin; GET the Recent Topics ACP page | The Patreon button's `src` is the bundled image, not `patreon.com`, and that image URL returns 200 (#200) |
+| `test_announcements_first_on_index` | `rt_announcements_first` = 1; create an announcement, then a newer normal topic; GET `index.php` | The announcement is listed above the newer normal topic in `#recent-topics-box` (#201) |
+| `test_acp_saves_announcements_first` | Admin ticks "Show announcements first" in the ACP and submits | `rt_announcements_first` is stored as 1 (#201) |
 | `test_ucp_preferences` | Logged in as admin; GET `/ucp.php?i=ucp_prefs&mode=view` | `input[name="rt_enable"]` and `input[name="rt_number"]` are present on the preferences page |
 
 ---

@@ -92,6 +92,9 @@ class recenttopics_module
 			$rt_min_topic_level = $request->variable('rt_min_topic_level', 0);
 			$config->set('rt_min_topic_level', $rt_min_topic_level);
 
+			// Show announcements first
+			$config->set('rt_announcements_first', $request->variable('rt_announcements_first', 0) ? 1 : 0);
+
 			// variable should be '' as it is a string ("1, 2, 3928") here, not an integer.
 			$rt_anti_topics = $request->variable('rt_anti_topics', '');
 			$ants = explode(',', $rt_anti_topics);
@@ -297,6 +300,7 @@ class recenttopics_module
 				'RT_ADS_CODE'        => $config_text->get('rt_ads_code'),
 				'RT_SHOW_LIKES'      => (int) $config['rt_show_likes'],
 				'RT_SIDE_SHOW_DATE'  => (int) $config['rt_side_show_date'],
+				'RT_ANNOUNCEMENTS_FIRST' => (int) $config['rt_announcements_first'],
 				'S_POSTLOVE'         => $phpbb_container->has('avathar.postlove.topic_likes'),
 				// Bundled copy, so the ACP page makes no request to Patreon's CDN (issue #200)
 				'U_PATREON_BUTTON'   => $phpbb_root_path . 'ext/avathar/recenttopics/adm/style/images/become_a_patron_button.png',
