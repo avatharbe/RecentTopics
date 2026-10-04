@@ -88,7 +88,7 @@ It creates the listener with mocked dependencies — a `config` object with real
 `event/ucp_listener.php` lets registered users customise their own Recent Topics experience. They can choose how many topics to show, where to position the block, whether to show only unread topics, and so on. The listener hooks into the UCP display-preferences page to show those settings and save them.
 
 There are three handlers:
-- `ucp_prefs_get_data` — runs on page load AND on form submit; builds the data array and (only on page load) renders the UCP template block
+- `ucp_prefs_get_data` — runs on page load AND on form submit; builds the data array, keeping the locations within their allowed options and the number within 1–999, and (only on page load) renders the UCP template block
 - `ucp_prefs_set_data` — maps the submitted form fields to the SQL column names used in `phpbb_users`
 - `ucp_register_set_data` — runs on `core.ucp_register_register_after`, after the new account is inserted, and writes the global config defaults to that user's row
 
@@ -100,6 +100,8 @@ Creates the listener with mocks for auth, config, request, template, user, langu
 | `test_getSubscribedEvents` | Verifies the 3 expected event subscriptions | Accidentally removed subscription stops the UCP page from working |
 | `test_ucp_prefs_set_data` | Submits 5 preference fields | Each `data['rt_*']` field must map to the correct `sql_ary['user_rt_*']` column; a mismatch means preferences silently fail to save |
 | `test_ucp_prefs_get_data_no_submit` | Page load (submit = false) | Must: merge user DB values into `data`, call `add_lang()`, call `template->assign_vars()` |
+| `test_submitted_preferences_are_validated` | Data provider: valid values; unknown location; `RT_SIDE` as viewforum location; numbers 100000, 0 and -5 | Locations outside the allowed options fall back to the user's stored value; the number is clamped to 1–999 (#198) |
+| `test_invalid_stored_location_falls_back_to_board_default` | Submitted and stored locations both invalid | The board default `rt_location` is used (#198) |
 | `test_ucp_prefs_get_data_on_submit` | Form submit (submit = true) | Must: merge data; must NOT call `template->assign_vars()` — template must only be touched on page load, not on form processing |
 | `test_register_defaults_run_after_the_account_exists` | Event map | `ucp_register_set_data` must be on `core.ucp_register_register_after` (fires after `user_add()`, carries `user_id`) and not on `core.ucp_register_data_after` (fires during validation, no `user_id`, so the UPDATE hit `user_id = 0`; #196) |
 | `test_ucp_register_set_data` | New user registration (user_id = 3) | Must call `sql_build_array('UPDATE', ...)` with all 5 default values, then `sql_query()` with `WHERE user_id = 3` — verified by mock expectations on the db object |
