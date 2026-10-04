@@ -36,6 +36,8 @@ phpBB fires named events as it runs (see `contrib/events.md`). An event dispatch
 
 ```
 tests/
+├── acp/
+│   └── acp_template_test.php      ACP template assets (no external images)
 ├── event/
 │   ├── listener_test.php          Main event listener (board index, ACP, WOL, permissions)
 │   └── ucp_listener_test.php      UCP preferences listener
@@ -224,7 +226,22 @@ It loads `recenttopics.php` from every language pack and checks that `VIEWING_RE
 
 ---
 
-## 9. Functional tests (`functional/recenttopics_test.php`)
+## 9. ACP template assets (`acp/acp_template_test.php`)
+
+**What this code does:**
+The ACP page shows a "Become a patron" button. The image ships with the extension (`adm/style/images/become_a_patron_button.png`), and the ACP module passes its URL to the template as `U_PATREON_BUTTON`.
+
+**What this test file does:**
+It reads the template and the image straight from disk.
+
+| Test | Scenario | What it verifies |
+|------|----------|-----------------|
+| `test_acp_template_loads_no_external_patreon_image` | `adm/style/acp_recenttopics.html` | No `patreon.com/external` URL; the image uses `{{ U_PATREON_BUTTON }}`. Before the fix every ACP page view made the admin's browser call Patreon's CDN (#200) |
+| `test_patreon_button_is_bundled` | `adm/style/images/become_a_patron_button.png` | The file exists and is a PNG |
+
+---
+
+## 10. Functional tests (`functional/recenttopics_test.php`)
 
 **What this code does:**
 These tests start a real phpBB installation (using the test framework's built-in install), enable the extension, and make HTTP requests using a real browser-like crawler (Symfony DomCrawler). They check the actual rendered HTML for specific elements.
@@ -240,6 +257,7 @@ Logs in as the admin account, optionally creates topics or changes config values
 | `test_rt_simple_page` | `rt_page_enable` = 1; GET `/app.php/rt/simple` | `<a id="recent-topics">` is present |
 | `test_rt_page_disabled` | `rt_page_enable` = 0; GET `/app.php/rt` | Page still loads (no 500 error); `<a id="recent-topics">` is present; `#recent-topics-box` must NOT appear |
 | `test_index_has_recent_topics` | `rt_index` = 1; create a topic; GET `index.php` | `<a id="recent-topics">` is present; `#recent-topics-box` contains the created topic title |
+| `test_acp_patreon_button_is_local` | Logged in as admin; GET the Recent Topics ACP page | The Patreon button's `src` is the bundled image, not `patreon.com`, and that image URL returns 200 (#200) |
 | `test_ucp_preferences` | Logged in as admin; GET `/ucp.php?i=ucp_prefs&mode=view` | `input[name="rt_enable"]` and `input[name="rt_number"]` are present on the preferences page |
 
 ---

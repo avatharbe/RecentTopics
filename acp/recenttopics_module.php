@@ -45,7 +45,7 @@ class recenttopics_module
 	 */
 	public function main($id, $mode)
 	{
-		global $phpbb_container;
+		global $phpbb_container, $phpbb_root_path;
 
 		$config = $phpbb_container->get('config');
 		$request = $phpbb_container->get('request');
@@ -298,7 +298,9 @@ class recenttopics_module
 				'RT_SHOW_LIKES'      => (int) $config['rt_show_likes'],
 				'RT_SIDE_SHOW_DATE'  => (int) $config['rt_side_show_date'],
 				'S_POSTLOVE'         => $phpbb_container->has('avathar.postlove.topic_likes'),
-				'S_RT_OK'            => version_compare($ext_version, $latest_version, '=='),
+				// Bundled copy, so the ACP page makes no request to Patreon's CDN (issue #200)
+				'U_PATREON_BUTTON'   => $phpbb_root_path . 'ext/avathar/recenttopics/adm/style/images/become_a_patron_button.png',
+				'S_RT_OK'          => version_compare($ext_version, $latest_version, '=='),
 				'S_RT_OLD'           => version_compare($ext_version, $latest_version, '<'),
 				'S_RT_DEV'           => version_compare($ext_version, $latest_version, '>'),
 				'EXT_VERSION'          => $ext_version,
