@@ -7,7 +7,7 @@ Recent Topics for phpBB 3.3
 Extension for phpBB to display recent topics on the index page.
 Originally based on NV Recent Topics by Joas Schilling ([nickvergessen](https://github.com/nickvergessen)), later maintained by PayBas. Now maintained by [avathar](https://www.avathar.be).
 
-**Version:** 3.0.11 (10/08/2026)
+**Version:** 3.0.12 (04/10/2026)
  
 #### Requirements
 - phpBB 3.3.0 or higher 
@@ -28,6 +28,7 @@ Originally based on NV Recent Topics by Joas Schilling ([nickvergessen](https://
 - Per-forum include/exclude (in ACP Forum Management)
 - Pagination: page limit, show all pages toggle
 - Minimum topic type level (normal/sticky/announcement/global)
+- Show announcements first: announcements and global announcements lead each page of the list
 - Exclude topics by ID
 - Display parent forum names
 - Topic title link target (first post, last post, or first unread)
@@ -58,6 +59,12 @@ prosilver, pbTech, pbWow3, WE Clearblue
 3. Copy the contents to `/ext/avathar/recenttopics/` (so that `ext.php` is at `/ext/avathar/recenttopics/ext.php`).
 4. Navigate in the ACP to `Customise -> Manage extensions`.
 5. Find `Recent Topics` under "Disabled Extensions" and click `Enable`.
+
+#### Upgrading
+1. Navigate in the ACP to `Customise -> Manage extensions` and click `Disable` for `Recent Topics` (do not delete its data).
+2. Replace the files in `/ext/avathar/recenttopics/` with the new release.
+3. Click `Enable` for `Recent Topics`. Enabling runs the new version's database migrations, so a plain file swap is not enough.
+4. Purge the cache (`General -> Purge the cache`).
 
 #### Uninstallation
 1. Navigate in the ACP to `Customise -> Manage extensions`.
