@@ -65,7 +65,7 @@ prosilver, pbTech, pbWow3, WE Clearblue
 3. To permanently uninstall, click `Delete Data`, then delete the `recenttopics` folder from `/ext/avathar/`.
 
 #### Support
-- [Support forum](https://www.avathar.be/forum/viewforum.php?f=16)
+- [Support forum](https://www.avathar.be/forum/viewforum.php?f=108)
 
 #### License
 [![License](https://img.shields.io/github/license/avatharbe/RecentTopics)](license.txt)                                                     
