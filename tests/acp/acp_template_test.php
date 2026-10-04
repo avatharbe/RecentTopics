@@ -42,6 +42,10 @@ class acp_template_test extends \phpbb_test_case
 		$file = $this->ext_root . '/adm/style/images/become_a_patron_button.png';
 
 		$this->assertFileExists($file);
-		$this->assertSame('image/png', mime_content_type($file));
+
+		// getimagesize() is core PHP; mime_content_type() needs ext/fileinfo, which the Windows CI job lacks
+		$info = getimagesize($file);
+		$this->assertSame('image/png', $info['mime']);
+		$this->assertSame([217, 51], [$info[0], $info[1]]);
 	}
 }
