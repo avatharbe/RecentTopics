@@ -43,6 +43,7 @@ tests/
 │   └── page_controller_test.php   Dedicated /rt and /rt/simple page controller
 ├── core/
 │   ├── forum_list_test.php        Which forums the list may draw topics from
+│   ├── topic_count_test.php       "Show all pages" count uses the forum list
 │   └── recenttopics_events_test.php   Public event API contract (contrib/events.md)
 └── functional/
     └── recenttopics_test.php      End-to-end browser tests
@@ -174,7 +175,21 @@ It builds `core\recenttopics` with a mocked `auth` (returning the readable forum
 
 ---
 
-## 6. Functional tests (`functional/recenttopics_test.php`)
+## 6. Page count (`core/topic_count_test.php`)
+
+**What this code does:**
+With "Show all recent topic pages" (`rt_page_number`) on, `display_recent_topics()` counts the user's recent topics to set the page limit. The count must use the same forum list as the topic list itself.
+
+**What this test file does:**
+It runs `display_recent_topics()` with mocked `auth`, `user`, `db` and `content_visibility`, a real event dispatcher, and `rt_page_number = 1`. The `content_visibility` mock records the forum ids each topic query is scoped to.
+
+| Test | Scenario | What it verifies |
+|------|----------|-----------------|
+| `test_page_count_query_uses_forum_list` | Readable forums 1 and 2; "Show all pages" on | Every topic query, including the page count, is scoped to forums 1 and 2. Before the fix the count ran before `get_forum_list()` and got `null`, so it only counted forums where the user has `m_approve` (#195) |
+
+---
+
+## 7. Functional tests (`functional/recenttopics_test.php`)
 
 **What this code does:**
 These tests start a real phpBB installation (using the test framework's built-in install), enable the extension, and make HTTP requests using a real browser-like crawler (Symfony DomCrawler). They check the actual rendered HTML for specific elements.

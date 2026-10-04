@@ -332,8 +332,23 @@ class recenttopics
 		$this->excluded_topics = explode(',', $this->config['rt_anti_topics']);
 		$min_topic_level = $this->config['rt_min_topic_level'];
 
+		$this->sort_topics = $this->config['rt_sort_start_time'] ? 'topic_time' : 'topic_last_post_time';
+		// if user can set recent topic sorting order and it is set then use the preference
+		if ($this->auth->acl_get('u_rt_sort_start_time') && isset($this->user->data['user_rt_sort_start_time']))
+		{
+			$this->sort_topics = $this->user->data['user_rt_sort_start_time'] ? 'topic_time' : 'topic_last_post_time';
+		}
+
+		$this->get_forum_list();
+		// No forums to display
+		if (count($this->forum_ids) == 0)
+		{
+			return;
+		}
+
 		//limit number of pages to be shown
 		// compute as product of topics per page and max number of pages.
+		// The count needs the forum list above, or it only counts m_approve forums (issue #195).
 		$this->total_topics_limit = 0;
 		if ((int) $this->config['rt_page_number'] == 0)
 		{
@@ -350,20 +365,6 @@ class recenttopics
 			$this->total_topics_limit = (int) $this->db->sql_fetchfield('topic_count');
 			$this->db->sql_freeresult($result);
 
-		}
-
-		$this->sort_topics = $this->config['rt_sort_start_time'] ? 'topic_time' : 'topic_last_post_time';
-		// if user can set recent topic sorting order and it is set then use the preference
-		if ($this->auth->acl_get('u_rt_sort_start_time') && isset($this->user->data['user_rt_sort_start_time']))
-		{
-			$this->sort_topics = $this->user->data['user_rt_sort_start_time'] ? 'topic_time' : 'topic_last_post_time';
-		}
-
-		$this->get_forum_list();
-		// No forums to display
-		if (count($this->forum_ids) == 0)
-		{
-			return;
 		}
 
 		$topics_count = $this->get_topic_list();
