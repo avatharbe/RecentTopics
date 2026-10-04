@@ -42,6 +42,7 @@ tests/
 ├── controller/
 │   └── page_controller_test.php   Dedicated /rt and /rt/simple page controller
 ├── core/
+│   ├── forum_list_test.php        Which forums the list may draw topics from
 │   └── recenttopics_events_test.php   Public event API contract (contrib/events.md)
 └── functional/
     └── recenttopics_test.php      End-to-end browser tests
@@ -157,7 +158,23 @@ Because that method requires a fully seeded database (topics, forums, user sessi
 
 ---
 
-## 5. Functional tests (`functional/recenttopics_test.php`)
+## 5. Forum list (`core/forum_list_test.php`)
+
+**What this code does:**
+`get_forum_list()` in `core/recenttopics.php` decides which forums the list may take topics from: forums where the user has `f_read` or `f_list_topics`, minus passworded forums the user has not unlocked, minus forums the admin excluded in the ACP.
+
+**What this test file does:**
+It builds `core\recenttopics` with a mocked `auth` (returning the readable forums), a mocked `user` (returning the passworded forums not yet unlocked) and a db stub that answers the ACP-exclusion query with every forum it is asked about. It calls `get_forum_list()` via `ReflectionMethod` and reads the private `forum_ids`.
+
+| Test | Scenario | What it verifies |
+|------|----------|-----------------|
+| `test_locked_passworded_forum_is_excluded` | Readable forums 1, 2, 3; forum 2 passworded and locked | Only 1 and 3 remain. phpBB grants `f_read` on a passworded forum regardless of the password, so without this the forum's titles and authors leak (#193) |
+| `test_locked_passworded_forum_is_excluded_when_one_forum_remains` | Readable forums 1, 2; forum 2 locked | Only 1 remains, on the code path that skips the ACP-exclusion query |
+| `test_forums_without_locked_password_are_kept` | Readable forums 1, 2, 3; none locked | All three remain |
+
+---
+
+## 6. Functional tests (`functional/recenttopics_test.php`)
 
 **What this code does:**
 These tests start a real phpBB installation (using the test framework's built-in install), enable the extension, and make HTTP requests using a real browser-like crawler (Symfony DomCrawler). They check the actual rendered HTML for specific elements.

@@ -480,6 +480,10 @@ class recenttopics
 		}
 		$this->forum_ids = array_unique($forum_ary);
 
+		// phpBB grants f_read on a passworded forum regardless of the password, so drop the ones
+		// this user has not unlocked, as the index, viewforum, search and feeds do (issue #193).
+		$this->forum_ids = array_diff($this->forum_ids, $this->user->get_passworded_forums());
+
 		if (count($this->forum_ids) > 1)
 		{
 			$sql = 'SELECT forum_id
