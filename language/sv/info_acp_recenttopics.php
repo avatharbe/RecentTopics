@@ -48,6 +48,7 @@ $lang = array_merge(
 	'RT_ANNOUNCEMENTS_FIRST_EXP'    => 'Flyttar meddelanden och globala meddelanden på varje sida i listan överst på den sidan. Äldre meddelanden som inte finns på sidan läggs inte till.',
 	'RT_ANTI_TOPICS'                => 'Exkluderade tråd-ID:n',
 	'RT_ANTI_TOPICS_EXP'            => 'ID:n för trådar att exkludera, separerade med "," (Exempel: 7,9)<br />Värdet 0 inaktiverar denna funktion.',
+	'RT_ANTI_TOPICS_INVALID'        => 'Uteslutna tråd-ID:n måste vara heltal åtskilda med kommatecken, till exempel 7,9. Inget sparades.',
 	'RT_PARENTS'                    => 'Visa överordnade forum',
 	'RT_PARENTS_EXP'                => 'Visa överordnade forum i trådraden för senaste trådar.',
 	'RT_TOPIC_LINK_TO'              => 'Trådtiteln länkar till',

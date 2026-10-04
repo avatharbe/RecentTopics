@@ -76,6 +76,14 @@ class recenttopics_module
 				trigger_error($language->lang('FORM_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
 
+			// Check the excluded topic IDs before saving anything, so invalid input is reported
+			// instead of being dropped while the page says the settings were saved (issue #217)
+			$rt_anti_topics = self::normalise_anti_topics($request->variable('rt_anti_topics', ''));
+			if ($rt_anti_topics === null)
+			{
+				trigger_error($language->lang('RT_ANTI_TOPICS_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
+			}
+
 			/*
 			* acp options for everyone
 			*/
@@ -95,22 +103,8 @@ class recenttopics_module
 			// Show announcements first
 			$config->set('rt_announcements_first', $request->variable('rt_announcements_first', 0) ? 1 : 0);
 
-			// variable should be '' as it is a string ("1, 2, 3928") here, not an integer.
-			$rt_anti_topics = $request->variable('rt_anti_topics', '');
-			$ants = explode(',', $rt_anti_topics);
-			$check_ants = true;
-			foreach ($ants as $ant)
-			{
-				if (!is_numeric($ant))
-				{
-					$check_ants = false;
-				}
-			}
-
-			if ($check_ants)
-			{
-				$config->set('rt_anti_topics', $rt_anti_topics);
-			}
+			// Excluded topic IDs, already checked above
+			$config->set('rt_anti_topics', $rt_anti_topics);
 
 			$rt_parents = $request->variable('rt_parents', false);
 			$config->set('rt_parents', $rt_parents);
@@ -313,6 +307,37 @@ class recenttopics_module
 			)
 		);
 
+	}
+
+	/**
+	 * Turn the ACP "Excluded topic IDs" input into the value to store (issue #217).
+	 *
+	 * Entries are trimmed and empty ones (a trailing comma, a blank field) are dropped; duplicates
+	 * are removed. An empty result becomes '0', which excludes nothing, so the field can be cleared.
+	 *
+	 * @param  string $input Raw comma-separated input, e.g. "7, 9"
+	 * @return string|null   Normalised list such as "7,9", or null if an entry is not a whole number
+	 */
+	public static function normalise_anti_topics($input)
+	{
+		$ids = [];
+		foreach (explode(',', (string) $input) as $entry)
+		{
+			$entry = trim($entry);
+			if ($entry === '')
+			{
+				continue;
+			}
+			if (!ctype_digit($entry))
+			{
+				return null;
+			}
+			$ids[] = (string) (int) $entry;
+		}
+
+		$ids = array_values(array_unique($ids));
+
+		return $ids === [] ? '0' : implode(',', $ids);
 	}
 
 	/**

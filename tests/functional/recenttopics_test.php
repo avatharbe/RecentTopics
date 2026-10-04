@@ -263,6 +263,42 @@ class recenttopics_test extends \phpbb_functional_test_case
 		$this->set_config('rt_announcements_first', 0);
 	}
 
+	/**
+	 * Invalid "Excluded topic IDs" input is reported and nothing is saved (#217).
+	 */
+	public function test_acp_rejects_invalid_anti_topics()
+	{
+		$this->login();
+		$this->admin_login();
+		$this->add_lang_ext('avathar/recenttopics', 'info_acp_recenttopics');
+		$this->set_config('rt_anti_topics', '7');
+
+		$crawler = self::request('GET', $this->acp_module_url());
+		$form = $crawler->selectButton('submit')->form();
+		$form['rt_anti_topics'] = '7,abc';
+		$crawler = self::submit($form);
+
+		$this->assertStringContainsString($this->lang('RT_ANTI_TOPICS_INVALID'), $crawler->text());
+		$this->assertSame('7', $this->get_config_value('rt_anti_topics'), 'An invalid list must not be saved');
+	}
+
+	/**
+	 * Clearing "Excluded topic IDs" is saved as 0, excluding nothing (#217).
+	 */
+	public function test_acp_clears_anti_topics()
+	{
+		$this->login();
+		$this->admin_login();
+		$this->set_config('rt_anti_topics', '7');
+
+		$crawler = self::request('GET', $this->acp_module_url());
+		$form = $crawler->selectButton('submit')->form();
+		$form['rt_anti_topics'] = '';
+		self::submit($form);
+
+		$this->assertSame('0', $this->get_config_value('rt_anti_topics'), 'An empty field must clear the list');
+	}
+
 	// -----------------------------------------------------------------------
 	// Helper
 	// -----------------------------------------------------------------------
@@ -273,6 +309,20 @@ class recenttopics_test extends \phpbb_functional_test_case
 	private function acp_module_url()
 	{
 		return 'adm/index.php?i=-avathar-recenttopics-acp-recenttopics_module&mode=recenttopics_config&sid=' . $this->sid;
+	}
+
+	/**
+	 * Read a phpBB config value straight from the database.
+	 */
+	private function get_config_value($name)
+	{
+		$db = $this->get_db();
+
+		$result = $db->sql_query("SELECT config_value FROM phpbb_config WHERE config_name = '" . $db->sql_escape($name) . "'");
+		$value = $db->sql_fetchfield('config_value');
+		$db->sql_freeresult($result);
+
+		return (string) $value;
 	}
 
 	/**

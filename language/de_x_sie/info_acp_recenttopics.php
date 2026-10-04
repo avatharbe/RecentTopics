@@ -63,6 +63,7 @@ $lang = array_merge(
 	'RT_ANNOUNCEMENTS_FIRST_EXP'    => 'Verschiebt die Bekanntmachungen und globalen Bekanntmachungen auf jeder Seite der Liste an den Anfang dieser Seite. Ältere Bekanntmachungen, die nicht auf der Seite stehen, werden nicht hinzugefügt.',
 	'RT_ANTI_TOPICS'                => 'Ausgeschlossene Themen',
 	'RT_ANTI_TOPICS_EXP'            => 'Geben Sie die Themen-IDs ein, kommagetrennt (z. B. 7,9), andernfalls 0, um alle Themen anzuzeigen (wie in der URL viewtopic.php?t=12345).',
+	'RT_ANTI_TOPICS_INVALID'        => 'Die ausgeschlossenen Themen-IDs müssen ganze Zahlen sein, durch Kommas getrennt, zum Beispiel 7,9. Es wurde nichts gespeichert.',
 	'RT_PARENTS'                    => 'Übergeordnete Foren anzeigen',
 	'RT_PARENTS_EXP'                => 'Übergeordnete Foren in der Liste der aktuellen Themen anzeigen.',
 	'RT_TOPIC_LINK_TO'              => 'Thementitel verlinkt auf',

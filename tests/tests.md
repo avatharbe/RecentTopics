@@ -37,7 +37,8 @@ phpBB fires named events as it runs (see `contrib/events.md`). An event dispatch
 ```
 tests/
 ├── acp/
-│   └── acp_template_test.php      ACP template assets (no external images)
+│   ├── acp_template_test.php      ACP template assets (no external images)
+│   └── anti_topics_test.php       ACP "Excluded topic IDs" input
 ├── event/
 │   ├── listener_test.php          Main event listener (board index, ACP, WOL, permissions)
 │   └── ucp_listener_test.php      UCP preferences listener
@@ -243,6 +244,12 @@ It reads the template and the image straight from disk.
 | `test_acp_template_loads_no_external_patreon_image` | `adm/style/acp_recenttopics.html` | No `patreon.com/external` URL; the image uses `{{ U_PATREON_BUTTON }}`. Before the fix every ACP page view made the admin's browser call Patreon's CDN (#200) |
 | `test_patreon_button_is_bundled` | `adm/style/images/become_a_patron_button.png` | The file exists and is a PNG |
 
+**`acp/anti_topics_test.php`** checks `recenttopics_module::normalise_anti_topics()`, which turns the "Excluded topic IDs" input into the value stored in `rt_anti_topics`. Its data provider has one row per input.
+
+| Test | Scenario | What it verifies |
+|------|----------|-----------------|
+| `test_normalise_anti_topics` | `7`, `7,9`, ` 7 , 9 `, `7,9,7`, `7,9,`, empty, blank, `0`, `7,abc`, `7.5`, `-3` | Valid lists are trimmed and de-duplicated; an empty field becomes `0` (exclude nothing), so it can be cleared; text, decimals and negatives return `null`, which makes the ACP show an error and save nothing (#217) |
+
 ---
 
 ## 10. Announcements first (`core/announcements_first_test.php`)
@@ -293,6 +300,8 @@ Logs in as the admin account, optionally creates topics or changes config values
 | `test_acp_patreon_button_is_local` | Logged in as admin; GET the Recent Topics ACP page | The Patreon button's `src` is the bundled image, not `patreon.com`, and that image URL returns 200 (#200) |
 | `test_announcements_first_on_index` | `rt_announcements_first` = 1; create an announcement, then a newer normal topic; GET `index.php` | The announcement is listed above the newer normal topic in `#recent-topics-box` (#201) |
 | `test_acp_saves_announcements_first` | Admin ticks "Show announcements first" in the ACP and submits | `rt_announcements_first` is stored as 1 (#201) |
+| `test_acp_rejects_invalid_anti_topics` | Admin submits `7,abc` as excluded topic IDs | The `RT_ANTI_TOPICS_INVALID` error is shown and the stored value stays `7` (#217) |
+| `test_acp_clears_anti_topics` | Admin empties the field and submits | `rt_anti_topics` is stored as `0` (#217) |
 | `test_ucp_preferences` | Logged in as admin; GET `/ucp.php?i=ucp_prefs&mode=view` | `input[name="rt_enable"]` and `input[name="rt_number"]` are present on the preferences page |
 
 ---

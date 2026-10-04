@@ -47,6 +47,7 @@ $lang = array_merge(
 	'RT_ANNOUNCEMENTS_FIRST_EXP'    => 'Coloca los anuncios y anuncios globales de cada página de la lista al principio de esa página. Los anuncios más antiguos que no estén en la página no se añaden.',
 	'RT_ANTI_TOPICS'                => 'Temas excluidos',
 	'RT_ANTI_TOPICS_EXP'            => 'Las IDs de los temas a excluir, separados por "," (Por ejemplo: 7,9)<br />Si no quiere excluir un tema, simplemente introduzca 0.',
+	'RT_ANTI_TOPICS_INVALID'        => 'Los ID de temas excluidos deben ser números enteros separados por comas, por ejemplo 7,9. No se ha guardado nada.',
 	'RT_PARENTS'                    => 'Mostrar foros padre',
 	'RT_PARENTS_EXP'                => 'Mostrar foros padre dentro de la fila del tema de "Temas Recientes".',
 	'RT_TOPIC_LINK_TO'              => 'El título del tema enlaza a',
