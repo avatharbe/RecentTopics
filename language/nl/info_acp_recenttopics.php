@@ -63,6 +63,7 @@ $lang = array_merge(
 		'RT_ANNOUNCEMENTS_FIRST_EXP'    => 'Plaatst de mededelingen en algemene mededelingen op elke pagina van de lijst bovenaan die pagina. Oudere mededelingen die niet op de pagina staan, worden niet toegevoegd.',
 		'RT_ANTI_TOPICS'                => 'Uitgesloten onderwerpen',
 		'RT_ANTI_TOPICS_EXP'            => 'Vul de onderwerp id’s in (bijvoorbeeld 7,9), anders 0. (deze nummers vind je in de url viewtopic.php?t=12345)',
+		'RT_ANTI_TOPICS_INVALID'        => 'Uitgesloten onderwerp-ID’s moeten gehele getallen zijn, gescheiden door komma’s, bijvoorbeeld 7,9. Er is niets opgeslagen.',
 		'RT_PARENTS'                    => 'Weergeven van hoofdforums',
 		'RT_PARENTS_EXP'                => 'Toon de hoofdforums in de onderwerpregel van de recente onderwerpen.',
 		'RT_TOPIC_LINK_TO'              => 'Onderwerptitel linkt naar',

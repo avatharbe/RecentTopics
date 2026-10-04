@@ -47,6 +47,7 @@ $lang = array_merge(
 	'RT_ANNOUNCEMENTS_FIRST_EXP'    => 'Coloca os anúncios e anúncios globais de cada página da lista no topo dessa página. Anúncios mais antigos que não estejam na página não são adicionados.',
 	'RT_ANTI_TOPICS'                => 'ID de tópico excluído',
 	'RT_ANTI_TOPICS_EXP'            => 'Os IDs de tópicos a excluir, separados por "," (Exemplo: 7,9) <br />O valor 0 desabilita esse comportamento.',
+	'RT_ANTI_TOPICS_INVALID'        => 'Os IDs dos tópicos excluídos devem ser números inteiros separados por vírgulas, por exemplo 7,9. Nada foi guardado.',
 	'RT_PARENTS'                    => 'Mostrar Fórum Pai',
 	'RT_PARENTS_EXP'                => 'Exibir fóruns pai dentro da linha tópico de tópicos recentes.',
 	'RT_TOPIC_LINK_TO'              => 'Título do tópico liga para',

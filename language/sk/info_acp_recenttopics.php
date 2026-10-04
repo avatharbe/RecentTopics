@@ -47,6 +47,7 @@ $lang = array_merge(
 	'RT_ANNOUNCEMENTS_FIRST_EXP'    => 'Presunie oznámenia a globálne oznámenia na každej stránke zoznamu na začiatok danej stránky. Staršie oznámenia, ktoré na stránke nie sú, sa nepridávajú.',
 	'RT_ANTI_TOPICS'                => 'Vylúčené témy',
 	'RT_ANTI_TOPICS_EXP'            => 'ID tém na vylúčenie, oddelené čiarkou „," (príklad: 7,9)<br />Hodnota 0 túto funkciu vypne.',
+	'RT_ANTI_TOPICS_INVALID'        => 'ID vylúčených tém musia byť celé čísla oddelené čiarkami, napríklad 7,9. Nič nebolo uložené.',
 	'RT_PARENTS'                    => 'Zobraziť nadradené fóra',
 	'RT_PARENTS_EXP'                => 'Zobraziť nadradené fóra v riadku podrobností pod názvom najnovšej témy.',
 	'RT_TOPIC_LINK_TO'              => 'Odkaz názvu témy vedie na',

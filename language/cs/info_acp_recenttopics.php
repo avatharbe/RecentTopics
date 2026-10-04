@@ -44,6 +44,7 @@ $lang = array_merge(
 	'RT_ANNOUNCEMENTS_FIRST_EXP'    => 'Přesune oznámení a globální oznámení na každé stránce seznamu na začátek dané stránky. Starší oznámení, která na stránce nejsou, se nepřidávají.',
 	'RT_ANTI_TOPICS'                => 'Vyloučená témata',
 	'RT_ANTI_TOPICS_EXP'            => 'Identifikátory témat k vyloučení, oddělené čárkou „,“ (příklad: 7,9)<br />',
+	'RT_ANTI_TOPICS_INVALID'        => 'ID vyloučených témat musí být celá čísla oddělená čárkami, například 7,9. Nic nebylo uloženo.',
 	'RT_PARENTS'                    => 'Zobrazit nadřazená fóra',
 	'RT_PARENTS_EXP'                => 'Zobrazit nadřazená fóra v řádku podrobností pod názvem nedávného tématu.',
 	'RT_TOPIC_LINK_TO'              => 'Odkaz názvu tématu vede na',

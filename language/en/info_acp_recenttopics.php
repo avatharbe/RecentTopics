@@ -47,6 +47,7 @@ $lang = array_merge(
 	'RT_ANNOUNCEMENTS_FIRST_EXP'    => 'Moves the announcements and global announcements on each page of the list to the top of that page. Older announcements that are not on the page are not added.',
 	'RT_ANTI_TOPICS'                => 'Excluded topic IDs',
 	'RT_ANTI_TOPICS_EXP'            => 'The IDs of topics to exclude, separated by “,” (Example: 7,9)<br />The value 0 disables this behaviour.',
+	'RT_ANTI_TOPICS_INVALID'        => 'Excluded topic IDs must be whole numbers separated by commas, for example 7,9. Nothing was saved.',
 	'RT_PARENTS'                    => 'Display parent forums',
 	'RT_PARENTS_EXP'                => 'Display parent forums inside the topic row of recent topics.',
 	'RT_TOPIC_LINK_TO'              => 'Topic title links to',

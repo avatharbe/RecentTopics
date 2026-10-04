@@ -63,6 +63,7 @@ $lang = array_merge($lang, array(
 	'RT_ANNOUNCEMENTS_FIRST_EXP'    => 'Place les annonces et annonces globales de chaque page de la liste en haut de cette page. Les annonces plus anciennes qui ne figurent pas sur la page ne sont pas ajoutées.',
 	'RT_ANTI_TOPICS'                => 'Exclure des sujets de l’affichage',
 	'RT_ANTI_TOPICS_EXP'            => 'Permet de saisir les ID, séparés par une virgule (exemple : 7,9), des sujets à exclure de l’affichage des sujets récents.<br />Pour afficher tous les sujets saisir la valeur 0.',
+	'RT_ANTI_TOPICS_INVALID'        => 'Les ID des sujets exclus doivent être des nombres entiers séparés par des virgules, par exemple 7,9. Rien n’a été enregistré.',
 	'RT_PARENTS'                    => 'Afficher les forums parents',
 	'RT_PARENTS_EXP'                => 'Permet d’afficher les forums parents dans l’arborescence des forums de l’affichage des sujets récents.',
 	'RT_TOPIC_LINK_TO'              => 'Le titre du sujet renvoie vers',
