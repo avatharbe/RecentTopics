@@ -15,12 +15,14 @@
   - [FIX] The ACP "Show like counts" setting now works; like counts showed whenever Post Love was installed (#197)
   - [FIX] UCP location and topic-count preferences are validated: locations must be one of the offered options, the count is kept within 1–999 (#198)
   - [FIX] Who Is Online shows "Viewing Recent Topics" as plain text in every language instead of a nested link with a stray `%s` (#199)
-  - [FIX] The last-post link in the list has a screen-reader label again (#192, thanks karelpak1)
+  - [FIX] The last-post link has a screen-reader label in every template; `VIEW_LATEST_POST` was never assigned, so it rendered empty. #192 fixed the index top/bottom template (thanks karelpak1), #215 the side, page, simple, pbTech, pbWoW3 and WE Clearblue templates
+  - [FIX] Members granted only "Can change the number of recent topics" now see the Recent Topics section in the UCP; the section was hidden unless they held one of the other preference permissions (#216)
+  - [FIX] ACP "Excluded topic IDs": an empty field now clears the list, and invalid entries show an error instead of being dropped while the page reported success (#217)
 
   Housekeeping
   - [CHANGE] The ACP "Become a patron" button is bundled with the extension instead of loaded from Patreon's servers on every ACP page view (#200)
   - [CHANGE] New `release_3_0_12` migration adds the `rt_announcements_first` setting and clears the permission cache once, so boards that enabled an earlier 3.0.x and were hit by #194 recover on upgrade
-  - [CHANGE] Unit tests for the forum list, the page count, like counts, announcement ordering, the UCP checks and the language packs; functional tests for the ACP settings
+  - [CHANGE] Unit tests for the forum list, the page count, like counts, announcement ordering, the UCP checks, the excluded-topics input, the language packs and the templates; functional tests for the ACP settings
 
 - 3.0.11 (10/08/2026) — validation release
 
