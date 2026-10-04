@@ -443,7 +443,7 @@ class recenttopics
 			'LAST_POST_IMG'                        => $this->user->img('icon_topic_latest', 'VIEW_LATEST_POST'),
 			'POLL_IMG'                             => $this->user->img('icon_topic_poll', 'TOPIC_POLL'),
 			'ADS_INDEX_CODE'                       => $ads_index_code,
-			'S_POSTLOVE'                           => $this->topic_likes_service !== null,
+			'S_POSTLOVE'                           => $this->show_likes(),
 			strtoupper($tpl_loopname) . '_DISPLAY' => true,
 		);
 
@@ -455,6 +455,17 @@ class recenttopics
 		$this->template->assign_vars($tpl_vars);
 
 		$this->fill_template($tpl_loopname, $topic_tracking_info, $topics_count);
+	}
+
+	/**
+	 * Whether Post Love like counts are shown: the service must be installed and the ACP
+	 * "Show like counts" setting (rt_show_likes) switched on (issue #197).
+	 *
+	 * @return bool
+	 */
+	private function show_likes(): bool
+	{
+		return $this->topic_likes_service !== null && !empty($this->config['rt_show_likes']);
 	}
 
 	/**
@@ -775,9 +786,9 @@ class recenttopics
 		$rowset = $this->get_topics_sql();
 		$topic_icons = array();
 
-		// Get postlove like counts if installed
+		// Get postlove like counts if installed and switched on in the ACP
 		$topic_likes = [];
-		if ($this->topic_likes_service !== null && !empty($this->topic_list))
+		if ($this->show_likes() && !empty($this->topic_list))
 		{
 			$topic_likes = $this->topic_likes_service->get_topic_like_counts($this->topic_list);
 		}

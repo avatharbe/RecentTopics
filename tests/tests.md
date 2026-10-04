@@ -44,6 +44,7 @@ tests/
 ├── core/
 │   ├── forum_list_test.php        Which forums the list may draw topics from
 │   ├── topic_count_test.php       "Show all pages" count uses the forum list
+│   ├── topic_likes_test.php       ACP "Show like counts" setting
 │   └── recenttopics_events_test.php   Public event API contract (contrib/events.md)
 └── functional/
     └── recenttopics_test.php      End-to-end browser tests
@@ -190,7 +191,22 @@ It runs `display_recent_topics()` with mocked `auth`, `user`, `db` and `content_
 
 ---
 
-## 7. Functional tests (`functional/recenttopics_test.php`)
+## 7. Like counts (`core/topic_likes_test.php`)
+
+**What this code does:**
+With Post Love installed, Recent Topics can show each topic's like count. `show_likes()` decides whether it does: the Post Love service must be present and the ACP "Show like counts" setting (`rt_show_likes`) switched on. It drives both the `S_POSTLOVE` template flag and whether the like counts are fetched at all.
+
+**What this test file does:**
+It runs `fill_template()` for one topic with a stand-in Post Love service that reports 7 likes and counts its calls. (The real service is optional and may not be installed, so it is not mocked by class.)
+
+| Test | Scenario | What it verifies |
+|------|----------|-----------------|
+| `test_like_counts_hidden_when_setting_is_off` | `rt_show_likes = 0` | `TOPIC_LIKES` is 0, Post Love is never queried, `show_likes()` is false. Before the fix the setting was ignored (#197) |
+| `test_like_counts_shown_when_setting_is_on` | `rt_show_likes = 1` | `TOPIC_LIKES` is 7, Post Love is queried once, `show_likes()` is true |
+
+---
+
+## 8. Functional tests (`functional/recenttopics_test.php`)
 
 **What this code does:**
 These tests start a real phpBB installation (using the test framework's built-in install), enable the extension, and make HTTP requests using a real browser-like crawler (Symfony DomCrawler). They check the actual rendered HTML for specific elements.
