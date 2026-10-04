@@ -195,6 +195,46 @@ class ucp_listener_test extends \phpbb_test_case
 			'No RT column may be written without the matching permission');
 	}
 
+	/**
+	 * A member holding only u_rt_number (besides u_rt_view) must get the UCP section and its
+	 * number field. S_RT_SHOW left u_rt_number out, so the whole section stayed hidden (#216).
+	 */
+	public function test_number_only_permission_shows_ucp_section()
+	{
+		$this->user->data = array(
+			'user_rt_enable'             => 1,
+			'user_rt_location'           => 'RT_TOP',
+			'user_rt_viewforum_location' => 'RT_TOP',
+			'user_rt_number'             => 5,
+			'user_rt_sort_start_time'    => 0,
+			'user_rt_unread_only'        => 0,
+		);
+
+		$this->request->method('variable')
+			->willReturnCallback(function ($var, $default) {
+				return $default;
+			});
+
+		$this->auth->method('acl_get')
+			->willReturnCallback(function ($perm) {
+				return ($perm === 'u_rt_view' || $perm === 'u_rt_number');
+			});
+
+		$assigned = array();
+		$this->template->method('assign_vars')
+			->willReturnCallback(function ($vars) use (&$assigned) {
+				$assigned = array_merge($assigned, $vars);
+			});
+
+		$this->set_listener();
+
+		$event = new \phpbb\event\data(array('data' => array(), 'submit' => false));
+		$this->listener->ucp_prefs_get_data($event);
+
+		$this->assertTrue(!empty($assigned['S_RT_SHOW']), 'S_RT_SHOW must be set so the UCP section renders');
+		$this->assertTrue(!empty($assigned['A_RT_NUMBER']), 'The number field must be offered');
+	}
+
 	public function test_ucp_prefs_get_data_no_submit()
 	{
 		$this->user->data = array(
