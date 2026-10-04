@@ -106,6 +106,7 @@ Creates the listener with mocks for auth, config, request, template, user, langu
 |------|----------|--------------------|
 | `test_getSubscribedEvents` | Verifies the 3 expected event subscriptions | Accidentally removed subscription stops the UCP page from working |
 | `test_ucp_prefs_set_data` | Submits 5 preference fields | Each `data['rt_*']` field must map to the correct `sql_ary['user_rt_*']` column; a mismatch means preferences silently fail to save |
+| `test_number_only_permission_shows_ucp_section` | Page load; user holds only `u_rt_view` and `u_rt_number` | `S_RT_SHOW` and `A_RT_NUMBER` are assigned. `S_RT_SHOW` used to omit `u_rt_number`, hiding the whole section from such a user (#216) |
 | `test_ucp_prefs_get_data_no_submit` | Page load (submit = false) | Must: merge user DB values into `data`, call `add_lang()`, call `template->assign_vars()` |
 | `test_submitted_preferences_are_validated` | Data provider: valid values; unknown location; `RT_SIDE` as viewforum location; numbers 100000, 0 and -5 | Locations outside the allowed options fall back to the user's stored value; the number is clamped to 1–999 (#198) |
 | `test_invalid_stored_location_falls_back_to_board_default` | Submitted and stored locations both invalid | The board default `rt_location` is used (#198) |
