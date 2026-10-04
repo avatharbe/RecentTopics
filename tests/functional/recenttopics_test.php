@@ -192,6 +192,25 @@ class recenttopics_test extends \phpbb_functional_test_case
 			'Submitting the genuine ACP form must still reset user preferences');
 	}
 
+	/**
+	 * The ACP donate button uses the extension's bundled image, not Patreon's CDN,
+	 * and that image is actually served (#200).
+	 */
+	public function test_acp_patreon_button_is_local()
+	{
+		$this->login();
+		$this->admin_login();
+
+		$crawler = self::request('GET', $this->acp_module_url());
+		$src = $crawler->filter('a[href*="patreon.com"] img')->attr('src');
+
+		$this->assertStringNotContainsString('patreon.com', $src);
+		$this->assertStringEndsWith('ext/avathar/recenttopics/adm/style/images/become_a_patron_button.png', $src);
+
+		self::request('GET', 'ext/avathar/recenttopics/adm/style/images/become_a_patron_button.png', array(), false);
+		$this->assertSame(200, self::$client->getResponse()->getStatus());
+	}
+
 	// -----------------------------------------------------------------------
 	// Helper
 	// -----------------------------------------------------------------------
