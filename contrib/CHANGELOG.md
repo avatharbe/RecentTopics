@@ -1,10 +1,31 @@
 ### Changelog
 
+- 3.0.12 (04/10/2026) — bugfix release
+
+  Upgrading: disable the extension, replace the files, enable it again. Enabling runs the 3.0.12 migration; a plain file swap does not.
+
+  New features
+  - [NEW] ACP option "Show announcements first": the announcements and global announcements on each page of the list move to the top of that page. Only topics already on the page move, so older announcements are not pulled back in; off by default (#201)
+
+  Fixes
+  - [FIX] Password-protected forums no longer leak topic titles, last-post subjects and authors into Recent Topics (index, viewforum and the standalone pages) before the password is entered (#193)
+  - [FIX] Existing members see Recent Topics straight after the extension is enabled — the install now clears the cached permissions, so the new `u_rt_view` grant takes effect (#194)
+  - [FIX] With "Show all recent topic pages" on, the page count now covers the user's Recent Topics forums instead of only forums they moderate, so the list is no longer cut short (#195)
+  - [FIX] New members get the board's Recent Topics defaults on registration — the defaults were written before the account existed, to user id 0 (#196)
+  - [FIX] The ACP "Show like counts" setting now works; like counts showed whenever Post Love was installed (#197)
+  - [FIX] UCP location and topic-count preferences are validated: locations must be one of the offered options, the count is kept within 1–999 (#198)
+  - [FIX] Who Is Online shows "Viewing Recent Topics" as plain text in every language instead of a nested link with a stray `%s` (#199)
+  - [FIX] The last-post link in the list has a screen-reader label again (#192, thanks karelpak1)
+
+  Housekeeping
+  - [CHANGE] The ACP "Become a patron" button is bundled with the extension instead of loaded from Patreon's servers on every ACP page view (#200)
+  - [CHANGE] New `release_3_0_12` migration adds the `rt_announcements_first` setting and clears the permission cache once, so boards that enabled an earlier 3.0.x and were hit by #194 recover on upgrade
+  - [CHANGE] Unit tests for the forum list, the page count, like counts, announcement ordering, the UCP checks and the language packs; functional tests for the ACP settings
+
 - 3.0.11 (10/08/2026) — validation release
 
   Version jumps from 3.0.1 to 3.0.11: the number was reset to 3.0.0 during the 3.0.0 namespace
-  rename, but the phpBB extensions database had already published up to 3.0.10, so every release
-  since has been numbered below what was already listed (#187).
+  rename, but the phpBB extensions database had already published up to 3.0.10.
 
   Fixes
   - [FIX] UCP no longer stores `user_rt_*` preferences the user lacks permission to set — the write path now mirrors the per-preference ACL checks the display path already made (#188)

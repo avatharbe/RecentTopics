@@ -59,6 +59,8 @@ $lang = array_merge(
 	'RT_PAGE_NUMBERMAX_EXP'         => 'Legt die maximale Anzahl der Seiten fest.',
 	'RT_MIN_TOPIC_LEVEL'            => 'Minimaler Thementyp',
 	'RT_MIN_TOPIC_LEVEL_EXP'        => 'Definiert das Minimum eines Thementyps, der angezeigt wird. Wenn Sie einen Thementyp angeben, werden nur Themen dieses oder eines höheren Typs angezeigt.',
+	'RT_ANNOUNCEMENTS_FIRST'        => 'Bekanntmachungen zuerst anzeigen',
+	'RT_ANNOUNCEMENTS_FIRST_EXP'    => 'Verschiebt die Bekanntmachungen und globalen Bekanntmachungen auf jeder Seite der Liste an den Anfang dieser Seite. Ältere Bekanntmachungen, die nicht auf der Seite stehen, werden nicht hinzugefügt.',
 	'RT_ANTI_TOPICS'                => 'Ausgeschlossene Themen',
 	'RT_ANTI_TOPICS_EXP'            => 'Geben Sie die Themen-IDs ein, kommagetrennt (z. B. 7,9), andernfalls 0, um alle Themen anzuzeigen (wie in der URL viewtopic.php?t=12345).',
 	'RT_PARENTS'                    => 'Übergeordnete Foren anzeigen',

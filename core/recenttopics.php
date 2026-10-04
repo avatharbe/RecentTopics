@@ -332,8 +332,23 @@ class recenttopics
 		$this->excluded_topics = explode(',', $this->config['rt_anti_topics']);
 		$min_topic_level = $this->config['rt_min_topic_level'];
 
+		$this->sort_topics = $this->config['rt_sort_start_time'] ? 'topic_time' : 'topic_last_post_time';
+		// if user can set recent topic sorting order and it is set then use the preference
+		if ($this->auth->acl_get('u_rt_sort_start_time') && isset($this->user->data['user_rt_sort_start_time']))
+		{
+			$this->sort_topics = $this->user->data['user_rt_sort_start_time'] ? 'topic_time' : 'topic_last_post_time';
+		}
+
+		$this->get_forum_list();
+		// No forums to display
+		if (count($this->forum_ids) == 0)
+		{
+			return;
+		}
+
 		//limit number of pages to be shown
 		// compute as product of topics per page and max number of pages.
+		// The count needs the forum list above, or it only counts m_approve forums (issue #195).
 		$this->total_topics_limit = 0;
 		if ((int) $this->config['rt_page_number'] == 0)
 		{
@@ -350,20 +365,6 @@ class recenttopics
 			$this->total_topics_limit = (int) $this->db->sql_fetchfield('topic_count');
 			$this->db->sql_freeresult($result);
 
-		}
-
-		$this->sort_topics = $this->config['rt_sort_start_time'] ? 'topic_time' : 'topic_last_post_time';
-		// if user can set recent topic sorting order and it is set then use the preference
-		if ($this->auth->acl_get('u_rt_sort_start_time') && isset($this->user->data['user_rt_sort_start_time']))
-		{
-			$this->sort_topics = $this->user->data['user_rt_sort_start_time'] ? 'topic_time' : 'topic_last_post_time';
-		}
-
-		$this->get_forum_list();
-		// No forums to display
-		if (count($this->forum_ids) == 0)
-		{
-			return;
 		}
 
 		$topics_count = $this->get_topic_list();
@@ -442,7 +443,7 @@ class recenttopics
 			'LAST_POST_IMG'                        => $this->user->img('icon_topic_latest', 'VIEW_LATEST_POST'),
 			'POLL_IMG'                             => $this->user->img('icon_topic_poll', 'TOPIC_POLL'),
 			'ADS_INDEX_CODE'                       => $ads_index_code,
-			'S_POSTLOVE'                           => $this->topic_likes_service !== null,
+			'S_POSTLOVE'                           => $this->show_likes(),
 			strtoupper($tpl_loopname) . '_DISPLAY' => true,
 		);
 
@@ -454,6 +455,44 @@ class recenttopics
 		$this->template->assign_vars($tpl_vars);
 
 		$this->fill_template($tpl_loopname, $topic_tracking_info, $topics_count);
+	}
+
+	/**
+	 * Whether Post Love like counts are shown: the service must be installed and the ACP
+	 * "Show like counts" setting (rt_show_likes) switched on (issue #197).
+	 *
+	 * @return bool
+	 */
+	private function show_likes(): bool
+	{
+		return $this->topic_likes_service !== null && !empty($this->config['rt_show_likes']);
+	}
+
+	/**
+	 * Put a page's announcements and global announcements ahead of its other topics.
+	 *
+	 * Only the rows already on this page move, so old announcements never come back into the
+	 * list. Both groups keep their existing (time) order; stickies stay with the normal topics.
+	 *
+	 * @param  array $rowset Topic rows for the current page, as returned by get_topics_sql()
+	 * @return array The same rows, announcements first
+	 */
+	private function announcements_first(array $rowset): array
+	{
+		$announcements = $others = [];
+		foreach ($rowset as $row)
+		{
+			if (in_array((int) $row['topic_type'], [POST_ANNOUNCE, POST_GLOBAL], true))
+			{
+				$announcements[] = $row;
+			}
+			else
+			{
+				$others[] = $row;
+			}
+		}
+
+		return array_merge($announcements, $others);
 	}
 
 	/**
@@ -479,6 +518,10 @@ class recenttopics
 			}
 		}
 		$this->forum_ids = array_unique($forum_ary);
+
+		// phpBB grants f_read on a passworded forum regardless of the password, so drop the ones
+		// this user has not unlocked, as the index, viewforum, search and feeds do (issue #193).
+		$this->forum_ids = array_diff($this->forum_ids, $this->user->get_passworded_forums());
 
 		if (count($this->forum_ids) > 1)
 		{
@@ -770,9 +813,15 @@ class recenttopics
 		$rowset = $this->get_topics_sql();
 		$topic_icons = array();
 
-		// Get postlove like counts if installed
+		// Move this page's announcements and global announcements to its top (issue #201)
+		if (!empty($this->config['rt_announcements_first']))
+		{
+			$rowset = $this->announcements_first($rowset);
+		}
+
+		// Get postlove like counts if installed and switched on in the ACP
 		$topic_likes = [];
-		if ($this->topic_likes_service !== null && !empty($this->topic_list))
+		if ($this->show_likes() && !empty($this->topic_list))
 		{
 			$topic_likes = $this->topic_likes_service->get_topic_like_counts($this->topic_list);
 		}

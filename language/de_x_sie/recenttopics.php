@@ -23,7 +23,7 @@ $lang = array_merge(
 	'RECENT_TOPICS'    => 'Aktuelle Themen',
 	'RT_NO_TOPICS'	   =>  'Es sind keine neuen Themen vorhanden.',
 	'LIKES'				=> 'Likes',
-	'VIEWING_RECENT_TOPICS'	=> 'Schaut sich <a href="%s">Aktuelle Themen</a> an',
+	'VIEWING_RECENT_TOPICS'	=> 'Schaut sich Aktuelle Themen an',
 	'EXTENSION_REQUIRES_330'	=> 'Diese Erweiterung benötigt phpBB 3.3.0 oder höher.',
 
 	// is_enableable() error messages

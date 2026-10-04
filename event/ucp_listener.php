@@ -28,6 +28,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ucp_listener implements EventSubscriberInterface
 {
+	/** Index-page block locations a user may choose */
+	const LOCATIONS = ['RT_TOP', 'RT_BOTTOM', 'RT_SIDE'];
+
+	/** Forum-view block locations a user may choose; there is no side column there */
+	const VIEWFORUM_LOCATIONS = ['RT_TOP', 'RT_BOTTOM'];
+
+	/** Range for the number of topics per page, matching the UCP form's max */
+	const NUMBER_MIN = 1;
+	const NUMBER_MAX = 999;
+
 	/**
 	* @var auth
 	*/
@@ -100,7 +110,7 @@ class ucp_listener implements EventSubscriberInterface
 		return array(
 		'core.ucp_prefs_view_data'        => 'ucp_prefs_get_data',
 		'core.ucp_prefs_view_update_data' => 'ucp_prefs_set_data',
-		'core.ucp_register_data_after'		  => 'ucp_register_set_data'
+		'core.ucp_register_register_after' => 'ucp_register_set_data'
 		);
 	}
 
@@ -120,9 +130,17 @@ class ucp_listener implements EventSubscriberInterface
 		$event['data'] = array_merge(
 			$event['data'], array(
 			'rt_enable'          => $this->request->variable('rt_enable', (int) $this->user->data['user_rt_enable']),
-			'rt_location'        => $this->request->variable('rt_location', $this->user->data['user_rt_location']),
-			'rt_viewforum_location' => $this->request->variable('rt_viewforum_location', $this->user->data['user_rt_viewforum_location']),
-			'rt_number'          => $this->request->variable('rt_number', (int) $this->user->data['user_rt_number']),
+			'rt_location'        => $this->valid_location(
+				$this->request->variable('rt_location', $this->user->data['user_rt_location']),
+				self::LOCATIONS, $this->user->data['user_rt_location'], $this->config['rt_location']
+			),
+			'rt_viewforum_location' => $this->valid_location(
+				$this->request->variable('rt_viewforum_location', $this->user->data['user_rt_viewforum_location']),
+				self::VIEWFORUM_LOCATIONS, $this->user->data['user_rt_viewforum_location'], $this->config['rt_viewforum_location']
+			),
+			'rt_number'          => max(self::NUMBER_MIN, min(self::NUMBER_MAX,
+				$this->request->variable('rt_number', (int) $this->user->data['user_rt_number'])
+			)),
 			'rt_sort_start_time' => $this->request->variable('rt_sort_start_time', (int) $this->user->data['user_rt_sort_start_time']),
 			'rt_unread_only'     => $this->request->variable('rt_unread_only', (int) $this->user->data['user_rt_unread_only']),
 			)
@@ -275,10 +293,35 @@ class ucp_listener implements EventSubscriberInterface
 	}
 
 	/**
+	 * Return a submitted block location if it is one of the allowed options (issue #198).
+	 *
+	 * Otherwise keep the user's stored location, or use the board default if that is not valid either.
+	 *
+	 * @param  string $submitted Location from the request
+	 * @param  array  $allowed   Valid locations for this setting
+	 * @param  string $stored    The user's current location
+	 * @param  string $default   The board-wide default location
+	 * @return string
+	 */
+	private function valid_location($submitted, array $allowed, $stored, $default)
+	{
+		foreach ([$submitted, $stored, $default] as $location)
+		{
+			if (in_array($location, $allowed, true))
+			{
+				return $location;
+			}
+		}
+
+		return $allowed[0];
+	}
+
+	/**
 	 * set a newly registered account's Recent Topics preferences from default.
 	 *
-	 * Fired after the user row has been inserted, so the user_rt_* columns are written by a second
-	 * UPDATE of our own rather than merged into an existing $sql_ary.
+	 * Listens to core.ucp_register_register_after, which fires after user_add() has inserted the row
+	 * and carries the new user_id, so the user_rt_* columns are written by a second UPDATE of our own.
+	 * core.ucp_register_data_after fires during form validation with no user_id (issue #196).
 	 *
 	 * @param  \phpbb\event\data $event Event object; reads ['user_id']
 	 * @return void

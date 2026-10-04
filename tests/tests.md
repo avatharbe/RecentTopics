@@ -36,13 +36,21 @@ phpBB fires named events as it runs (see `contrib/events.md`). An event dispatch
 
 ```
 tests/
+├── acp/
+│   └── acp_template_test.php      ACP template assets (no external images)
 ├── event/
 │   ├── listener_test.php          Main event listener (board index, ACP, WOL, permissions)
 │   └── ucp_listener_test.php      UCP preferences listener
 ├── controller/
 │   └── page_controller_test.php   Dedicated /rt and /rt/simple page controller
 ├── core/
+│   ├── announcements_first_test.php   ACP "Show announcements first" setting
+│   ├── forum_list_test.php        Which forums the list may draw topics from
+│   ├── topic_count_test.php       "Show all pages" count uses the forum list
+│   ├── topic_likes_test.php       ACP "Show like counts" setting
 │   └── recenttopics_events_test.php   Public event API contract (contrib/events.md)
+├── language/
+│   └── viewonline_lang_test.php   Who Is Online label in every language pack
 └── functional/
     └── recenttopics_test.php      End-to-end browser tests
 ```
@@ -85,9 +93,9 @@ It creates the listener with mocked dependencies — a `config` object with real
 `event/ucp_listener.php` lets registered users customise their own Recent Topics experience. They can choose how many topics to show, where to position the block, whether to show only unread topics, and so on. The listener hooks into the UCP display-preferences page to show those settings and save them.
 
 There are three handlers:
-- `ucp_prefs_get_data` — runs on page load AND on form submit; builds the data array and (only on page load) renders the UCP template block
+- `ucp_prefs_get_data` — runs on page load AND on form submit; builds the data array, keeping the locations within their allowed options and the number within 1–999, and (only on page load) renders the UCP template block
 - `ucp_prefs_set_data` — maps the submitted form fields to the SQL column names used in `phpbb_users`
-- `ucp_register_set_data` — runs when a new account is created and writes the global config defaults to that user's row
+- `ucp_register_set_data` — runs on `core.ucp_register_register_after`, after the new account is inserted, and writes the global config defaults to that user's row
 
 **What this test file does:**
 Creates the listener with mocks for auth, config, request, template, user, language, and db. Because `ucp_register_set_data` actually runs a database query, it is the only handler tested with mock expectations on `sql_build_array` and `sql_query`.
@@ -97,8 +105,11 @@ Creates the listener with mocks for auth, config, request, template, user, langu
 | `test_getSubscribedEvents` | Verifies the 3 expected event subscriptions | Accidentally removed subscription stops the UCP page from working |
 | `test_ucp_prefs_set_data` | Submits 5 preference fields | Each `data['rt_*']` field must map to the correct `sql_ary['user_rt_*']` column; a mismatch means preferences silently fail to save |
 | `test_ucp_prefs_get_data_no_submit` | Page load (submit = false) | Must: merge user DB values into `data`, call `add_lang()`, call `template->assign_vars()` |
+| `test_submitted_preferences_are_validated` | Data provider: valid values; unknown location; `RT_SIDE` as viewforum location; numbers 100000, 0 and -5 | Locations outside the allowed options fall back to the user's stored value; the number is clamped to 1–999 (#198) |
+| `test_invalid_stored_location_falls_back_to_board_default` | Submitted and stored locations both invalid | The board default `rt_location` is used (#198) |
 | `test_ucp_prefs_get_data_on_submit` | Form submit (submit = true) | Must: merge data; must NOT call `template->assign_vars()` — template must only be touched on page load, not on form processing |
-| `test_ucp_register_set_data` | New user registration (user_id = 3) | Must call `sql_build_array('UPDATE', ...)` with all 5 default values, then `sql_query()` — verified by mock expectations on the db object |
+| `test_register_defaults_run_after_the_account_exists` | Event map | `ucp_register_set_data` must be on `core.ucp_register_register_after` (fires after `user_add()`, carries `user_id`) and not on `core.ucp_register_data_after` (fires during validation, no `user_id`, so the UPDATE hit `user_id = 0`; #196) |
+| `test_ucp_register_set_data` | New user registration (user_id = 3) | Must call `sql_build_array('UPDATE', ...)` with all 5 default values, then `sql_query()` with `WHERE user_id = 3` — verified by mock expectations on the db object |
 
 ---
 
@@ -157,7 +168,96 @@ Because that method requires a fully seeded database (topics, forums, user sessi
 
 ---
 
-## 5. Functional tests (`functional/recenttopics_test.php`)
+## 5. Forum list (`core/forum_list_test.php`)
+
+**What this code does:**
+`get_forum_list()` in `core/recenttopics.php` decides which forums the list may take topics from: forums where the user has `f_read` or `f_list_topics`, minus passworded forums the user has not unlocked, minus forums the admin excluded in the ACP.
+
+**What this test file does:**
+It builds `core\recenttopics` with a mocked `auth` (returning the readable forums), a mocked `user` (returning the passworded forums not yet unlocked) and a db stub that answers the ACP-exclusion query with every forum it is asked about. It calls `get_forum_list()` via `ReflectionMethod` and reads the private `forum_ids`.
+
+| Test | Scenario | What it verifies |
+|------|----------|-----------------|
+| `test_locked_passworded_forum_is_excluded` | Readable forums 1, 2, 3; forum 2 passworded and locked | Only 1 and 3 remain. phpBB grants `f_read` on a passworded forum regardless of the password, so without this the forum's titles and authors leak (#193) |
+| `test_locked_passworded_forum_is_excluded_when_one_forum_remains` | Readable forums 1, 2; forum 2 locked | Only 1 remains, on the code path that skips the ACP-exclusion query |
+| `test_forums_without_locked_password_are_kept` | Readable forums 1, 2, 3; none locked | All three remain |
+
+---
+
+## 6. Page count (`core/topic_count_test.php`)
+
+**What this code does:**
+With "Show all recent topic pages" (`rt_page_number`) on, `display_recent_topics()` counts the user's recent topics to set the page limit. The count must use the same forum list as the topic list itself.
+
+**What this test file does:**
+It runs `display_recent_topics()` with mocked `auth`, `user`, `db` and `content_visibility`, a real event dispatcher, and `rt_page_number = 1`. The `content_visibility` mock records the forum ids each topic query is scoped to.
+
+| Test | Scenario | What it verifies |
+|------|----------|-----------------|
+| `test_page_count_query_uses_forum_list` | Readable forums 1 and 2; "Show all pages" on | Every topic query, including the page count, is scoped to forums 1 and 2. Before the fix the count ran before `get_forum_list()` and got `null`, so it only counted forums where the user has `m_approve` (#195) |
+
+---
+
+## 7. Like counts (`core/topic_likes_test.php`)
+
+**What this code does:**
+With Post Love installed, Recent Topics can show each topic's like count. `show_likes()` decides whether it does: the Post Love service must be present and the ACP "Show like counts" setting (`rt_show_likes`) switched on. It drives both the `S_POSTLOVE` template flag and whether the like counts are fetched at all.
+
+**What this test file does:**
+It runs `fill_template()` for one topic with a stand-in Post Love service that reports 7 likes and counts its calls. (The real service is optional and may not be installed, so it is not mocked by class.)
+
+| Test | Scenario | What it verifies |
+|------|----------|-----------------|
+| `test_like_counts_hidden_when_setting_is_off` | `rt_show_likes = 0` | `TOPIC_LIKES` is 0, Post Love is never queried, `show_likes()` is false. Before the fix the setting was ignored (#197) |
+| `test_like_counts_shown_when_setting_is_on` | `rt_show_likes = 1` | `TOPIC_LIKES` is 7, Post Love is queried once, `show_likes()` is true |
+
+---
+
+## 8. Who Is Online label (`language/viewonline_lang_test.php`)
+
+**What this code does:**
+When someone is on `/app.php/rt` or `/app.php/rt/simple`, the listener sets their Who Is Online location to `VIEWING_RECENT_TOPICS` and the link to the page. Core's `viewonline_body.html` wraps that label in its own `<a href="{U_FORUM_LOCATION}">`.
+
+**What this test file does:**
+It loads `recenttopics.php` from every language pack and checks that `VIEWING_RECENT_TOPICS` is plain text: no HTML and no `%` placeholder.
+
+| Test | Scenario | What it verifies |
+|------|----------|-----------------|
+| `test_viewing_recent_topics_is_plain_text` | Data provider: one row per language pack | The label has no `<` and no `%`. The packs used to carry `<a href="%s">…</a>`, which nested a link with an unfilled `%s` inside core's link (#199) |
+
+---
+
+## 9. ACP template assets (`acp/acp_template_test.php`)
+
+**What this code does:**
+The ACP page shows a "Become a patron" button. The image ships with the extension (`adm/style/images/become_a_patron_button.png`), and the ACP module passes its URL to the template as `U_PATREON_BUTTON`.
+
+**What this test file does:**
+It reads the template and the image straight from disk.
+
+| Test | Scenario | What it verifies |
+|------|----------|-----------------|
+| `test_acp_template_loads_no_external_patreon_image` | `adm/style/acp_recenttopics.html` | No `patreon.com/external` URL; the image uses `{{ U_PATREON_BUTTON }}`. Before the fix every ACP page view made the admin's browser call Patreon's CDN (#200) |
+| `test_patreon_button_is_bundled` | `adm/style/images/become_a_patron_button.png` | The file exists and is a PNG |
+
+---
+
+## 10. Announcements first (`core/announcements_first_test.php`)
+
+**What this code does:**
+With the ACP setting "Show announcements first" (`rt_announcements_first`) on, `fill_template()` moves the announcements and global announcements on the current page to the top of that page. Only rows already on the page move, so old announcements never come back into the list; stickies stay with the normal topics.
+
+**What this test file does:**
+It runs `fill_template()` on one page of four topics in time order (normal, announcement, sticky, global announcement) and records the order in which they reach `assign_block_vars()`.
+
+| Test | Scenario | What it verifies |
+|------|----------|-----------------|
+| `test_announcements_lead_the_page_when_setting_is_on` | Setting on | Order is announcement, global announcement, normal, sticky: announcements first in their time order, the rest unchanged (#201) |
+| `test_page_keeps_time_order_when_setting_is_off` | Setting off (default) | Order is unchanged |
+
+---
+
+## 11. Functional tests (`functional/recenttopics_test.php`)
 
 **What this code does:**
 These tests start a real phpBB installation (using the test framework's built-in install), enable the extension, and make HTTP requests using a real browser-like crawler (Symfony DomCrawler). They check the actual rendered HTML for specific elements.
@@ -173,6 +273,9 @@ Logs in as the admin account, optionally creates topics or changes config values
 | `test_rt_simple_page` | `rt_page_enable` = 1; GET `/app.php/rt/simple` | `<a id="recent-topics">` is present |
 | `test_rt_page_disabled` | `rt_page_enable` = 0; GET `/app.php/rt` | Page still loads (no 500 error); `<a id="recent-topics">` is present; `#recent-topics-box` must NOT appear |
 | `test_index_has_recent_topics` | `rt_index` = 1; create a topic; GET `index.php` | `<a id="recent-topics">` is present; `#recent-topics-box` contains the created topic title |
+| `test_acp_patreon_button_is_local` | Logged in as admin; GET the Recent Topics ACP page | The Patreon button's `src` is the bundled image, not `patreon.com`, and that image URL returns 200 (#200) |
+| `test_announcements_first_on_index` | `rt_announcements_first` = 1; create an announcement, then a newer normal topic; GET `index.php` | The announcement is listed above the newer normal topic in `#recent-topics-box` (#201) |
+| `test_acp_saves_announcements_first` | Admin ticks "Show announcements first" in the ACP and submits | `rt_announcements_first` is stored as 1 (#201) |
 | `test_ucp_preferences` | Logged in as admin; GET `/ucp.php?i=ucp_prefs&mode=view` | `input[name="rt_enable"]` and `input[name="rt_number"]` are present on the preferences page |
 
 ---

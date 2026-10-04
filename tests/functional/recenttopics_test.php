@@ -192,6 +192,77 @@ class recenttopics_test extends \phpbb_functional_test_case
 			'Submitting the genuine ACP form must still reset user preferences');
 	}
 
+	/**
+	 * The ACP donate button uses the extension's bundled image, not Patreon's CDN,
+	 * and that image is actually served (#200).
+	 */
+	public function test_acp_patreon_button_is_local()
+	{
+		$this->login();
+		$this->admin_login();
+
+		$crawler = self::request('GET', $this->acp_module_url());
+		$src = $crawler->filter('a[href*="patreon.com"] img')->attr('src');
+
+		$this->assertStringNotContainsString('patreon.com', $src);
+		$this->assertStringEndsWith('ext/avathar/recenttopics/adm/style/images/become_a_patron_button.png', $src);
+
+		self::request('GET', 'ext/avathar/recenttopics/adm/style/images/become_a_patron_button.png', array(), false);
+		$this->assertSame(200, self::$client->getResponse()->getStatus());
+	}
+
+	/**
+	 * With "Show announcements first" on, an announcement on the page is listed above a
+	 * newer normal topic (#201).
+	 */
+	public function test_announcements_first_on_index()
+	{
+		$this->login();
+		$this->set_config('rt_index', 1);
+		$this->set_config('rt_announcements_first', 1);
+
+		// The announcement is older than the normal topic, so time order alone lists it second
+		$this->create_topic(2, 'RT Announcement 201', 'Announcement for issue 201.', array('topic_type' => POST_ANNOUNCE));
+		$this->create_topic(2, 'RT Normal topic 201', 'Normal topic for issue 201.');
+
+		$crawler = self::request('GET', 'index.php?sid=' . $this->sid);
+		$titles = $crawler->filter('#recent-topics-box a.topictitle')->each(function ($node) {
+			return $node->text();
+		});
+
+		$announcement = array_search('RT Announcement 201', $titles, true);
+		$normal = array_search('RT Normal topic 201', $titles, true);
+		$this->assertNotFalse($announcement, 'The announcement must be listed');
+		$this->assertNotFalse($normal, 'The normal topic must be listed');
+		$this->assertLessThan($normal, $announcement, 'The announcement must be listed above the newer normal topic');
+
+		$this->set_config('rt_announcements_first', 0);
+	}
+
+	/**
+	 * The ACP saves the "Show announcements first" checkbox (#201).
+	 */
+	public function test_acp_saves_announcements_first()
+	{
+		$this->login();
+		$this->admin_login();
+		$this->set_config('rt_announcements_first', 0);
+
+		$crawler = self::request('GET', $this->acp_module_url());
+		$form = $crawler->selectButton('submit')->form();
+		$form['rt_announcements_first']->tick();
+		self::submit($form);
+
+		$db = $this->get_db();
+		$result = $db->sql_query("SELECT config_value FROM phpbb_config WHERE config_name = 'rt_announcements_first'");
+		$value = $db->sql_fetchfield('config_value');
+		$db->sql_freeresult($result);
+
+		$this->assertSame('1', (string) $value, 'Ticking the checkbox must store rt_announcements_first = 1');
+
+		$this->set_config('rt_announcements_first', 0);
+	}
+
 	// -----------------------------------------------------------------------
 	// Helper
 	// -----------------------------------------------------------------------

@@ -75,8 +75,21 @@ class ucp_listener_test extends \phpbb_test_case
 		$this->assertEquals(array(
 			'core.ucp_prefs_view_data',
 			'core.ucp_prefs_view_update_data',
-			'core.ucp_register_data_after',
+			'core.ucp_register_register_after',
 		), array_keys(\avathar\recenttopics\event\ucp_listener::getSubscribedEvents()));
+	}
+
+	/**
+	 * The registration defaults must hang off an event that fires after user_add() and
+	 * carries the new user_id. core.ucp_register_data_after fires during form validation,
+	 * has no user_id, and made the UPDATE hit user_id = 0 (#196).
+	 */
+	public function test_register_defaults_run_after_the_account_exists()
+	{
+		$events = \avathar\recenttopics\event\ucp_listener::getSubscribedEvents();
+
+		$this->assertSame('ucp_register_set_data', $events['core.ucp_register_register_after'] ?? null);
+		$this->assertArrayNotHasKey('core.ucp_register_data_after', $events);
 	}
 
 	/**
@@ -224,6 +237,80 @@ class ucp_listener_test extends \phpbb_test_case
 		$this->assertEquals(5, $event['data']['rt_number']);
 	}
 
+	/**
+	 * Submitted location / number preferences, and what must reach $event['data'] (#198).
+	 * Stored user values: location RT_BOTTOM, viewforum location RT_TOP, number 5.
+	 */
+	public function submitted_preferences_data()
+	{
+		return array(
+			'valid values pass through'           => array('RT_SIDE', 'RT_BOTTOM', 20, 'RT_SIDE', 'RT_BOTTOM', 20),
+			'unknown location keeps stored value' => array('RT_EVIL', 'RT_TOP', 5, 'RT_BOTTOM', 'RT_TOP', 5),
+			'side is not a viewforum location'    => array('RT_TOP', 'RT_SIDE', 5, 'RT_TOP', 'RT_TOP', 5),
+			'number above 999 is clamped'         => array('RT_TOP', 'RT_TOP', 100000, 'RT_TOP', 'RT_TOP', 999),
+			'zero is raised to 1'                 => array('RT_TOP', 'RT_TOP', 0, 'RT_TOP', 'RT_TOP', 1),
+			'negative number is raised to 1'      => array('RT_TOP', 'RT_TOP', -5, 'RT_TOP', 'RT_TOP', 1),
+		);
+	}
+
+	/**
+	 * @dataProvider submitted_preferences_data
+	 */
+	public function test_submitted_preferences_are_validated($location, $vf_location, $number, $expected_location, $expected_vf_location, $expected_number)
+	{
+		$this->user->data = array(
+			'user_rt_enable'             => 1,
+			'user_rt_location'           => 'RT_BOTTOM',
+			'user_rt_viewforum_location' => 'RT_TOP',
+			'user_rt_number'             => 5,
+			'user_rt_sort_start_time'    => 0,
+			'user_rt_unread_only'        => 0,
+		);
+
+		$submitted = array('rt_location' => $location, 'rt_viewforum_location' => $vf_location, 'rt_number' => $number);
+		$this->request->method('variable')
+			->willReturnCallback(function ($var, $default) use ($submitted) {
+				return $submitted[$var] ?? $default;
+			});
+
+		$this->set_listener();
+
+		$event = new \phpbb\event\data(array('data' => array(), 'submit' => true));
+		$this->listener->ucp_prefs_get_data($event);
+
+		$this->assertSame($expected_location, $event['data']['rt_location']);
+		$this->assertSame($expected_vf_location, $event['data']['rt_viewforum_location']);
+		$this->assertSame($expected_number, $event['data']['rt_number']);
+	}
+
+	/**
+	 * A stored location that is itself invalid falls back to the board default (#198).
+	 */
+	public function test_invalid_stored_location_falls_back_to_board_default()
+	{
+		$this->config['rt_location'] = 'RT_SIDE';
+		$this->user->data = array(
+			'user_rt_enable'             => 1,
+			'user_rt_location'           => 'GARBAGE',
+			'user_rt_viewforum_location' => 'RT_TOP',
+			'user_rt_number'             => 5,
+			'user_rt_sort_start_time'    => 0,
+			'user_rt_unread_only'        => 0,
+		);
+
+		$this->request->method('variable')
+			->willReturnCallback(function ($var, $default) {
+				return $var === 'rt_location' ? 'RT_EVIL' : $default;
+			});
+
+		$this->set_listener();
+
+		$event = new \phpbb\event\data(array('data' => array(), 'submit' => true));
+		$this->listener->ucp_prefs_get_data($event);
+
+		$this->assertSame('RT_SIDE', $event['data']['rt_location']);
+	}
+
 	public function test_ucp_prefs_get_data_on_submit()
 	{
 		$this->user->data = array(
@@ -273,7 +360,8 @@ class ucp_listener_test extends \phpbb_test_case
 			->willReturn("user_rt_enable = 1");
 
 		$this->db->expects($this->once())
-			->method('sql_query');
+			->method('sql_query')
+			->with($this->stringContains('WHERE user_id = 3'));
 
 		$this->set_listener();
 
