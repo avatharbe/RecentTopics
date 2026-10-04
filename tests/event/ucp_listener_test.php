@@ -75,8 +75,21 @@ class ucp_listener_test extends \phpbb_test_case
 		$this->assertEquals(array(
 			'core.ucp_prefs_view_data',
 			'core.ucp_prefs_view_update_data',
-			'core.ucp_register_data_after',
+			'core.ucp_register_register_after',
 		), array_keys(\avathar\recenttopics\event\ucp_listener::getSubscribedEvents()));
+	}
+
+	/**
+	 * The registration defaults must hang off an event that fires after user_add() and
+	 * carries the new user_id. core.ucp_register_data_after fires during form validation,
+	 * has no user_id, and made the UPDATE hit user_id = 0 (#196).
+	 */
+	public function test_register_defaults_run_after_the_account_exists()
+	{
+		$events = \avathar\recenttopics\event\ucp_listener::getSubscribedEvents();
+
+		$this->assertSame('ucp_register_set_data', $events['core.ucp_register_register_after'] ?? null);
+		$this->assertArrayNotHasKey('core.ucp_register_data_after', $events);
 	}
 
 	/**
@@ -273,7 +286,8 @@ class ucp_listener_test extends \phpbb_test_case
 			->willReturn("user_rt_enable = 1");
 
 		$this->db->expects($this->once())
-			->method('sql_query');
+			->method('sql_query')
+			->with($this->stringContains('WHERE user_id = 3'));
 
 		$this->set_listener();
 

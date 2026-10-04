@@ -89,7 +89,7 @@ It creates the listener with mocked dependencies — a `config` object with real
 There are three handlers:
 - `ucp_prefs_get_data` — runs on page load AND on form submit; builds the data array and (only on page load) renders the UCP template block
 - `ucp_prefs_set_data` — maps the submitted form fields to the SQL column names used in `phpbb_users`
-- `ucp_register_set_data` — runs when a new account is created and writes the global config defaults to that user's row
+- `ucp_register_set_data` — runs on `core.ucp_register_register_after`, after the new account is inserted, and writes the global config defaults to that user's row
 
 **What this test file does:**
 Creates the listener with mocks for auth, config, request, template, user, language, and db. Because `ucp_register_set_data` actually runs a database query, it is the only handler tested with mock expectations on `sql_build_array` and `sql_query`.
@@ -100,7 +100,8 @@ Creates the listener with mocks for auth, config, request, template, user, langu
 | `test_ucp_prefs_set_data` | Submits 5 preference fields | Each `data['rt_*']` field must map to the correct `sql_ary['user_rt_*']` column; a mismatch means preferences silently fail to save |
 | `test_ucp_prefs_get_data_no_submit` | Page load (submit = false) | Must: merge user DB values into `data`, call `add_lang()`, call `template->assign_vars()` |
 | `test_ucp_prefs_get_data_on_submit` | Form submit (submit = true) | Must: merge data; must NOT call `template->assign_vars()` — template must only be touched on page load, not on form processing |
-| `test_ucp_register_set_data` | New user registration (user_id = 3) | Must call `sql_build_array('UPDATE', ...)` with all 5 default values, then `sql_query()` — verified by mock expectations on the db object |
+| `test_register_defaults_run_after_the_account_exists` | Event map | `ucp_register_set_data` must be on `core.ucp_register_register_after` (fires after `user_add()`, carries `user_id`) and not on `core.ucp_register_data_after` (fires during validation, no `user_id`, so the UPDATE hit `user_id = 0`; #196) |
+| `test_ucp_register_set_data` | New user registration (user_id = 3) | Must call `sql_build_array('UPDATE', ...)` with all 5 default values, then `sql_query()` with `WHERE user_id = 3` — verified by mock expectations on the db object |
 
 ---
 
