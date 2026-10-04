@@ -28,6 +28,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ucp_listener implements EventSubscriberInterface
 {
+	/** Index-page block locations a user may choose */
+	const LOCATIONS = ['RT_TOP', 'RT_BOTTOM', 'RT_SIDE'];
+
+	/** Forum-view block locations a user may choose; there is no side column there */
+	const VIEWFORUM_LOCATIONS = ['RT_TOP', 'RT_BOTTOM'];
+
+	/** Range for the number of topics per page, matching the UCP form's max */
+	const NUMBER_MIN = 1;
+	const NUMBER_MAX = 999;
+
 	/**
 	* @var auth
 	*/
@@ -120,9 +130,17 @@ class ucp_listener implements EventSubscriberInterface
 		$event['data'] = array_merge(
 			$event['data'], array(
 			'rt_enable'          => $this->request->variable('rt_enable', (int) $this->user->data['user_rt_enable']),
-			'rt_location'        => $this->request->variable('rt_location', $this->user->data['user_rt_location']),
-			'rt_viewforum_location' => $this->request->variable('rt_viewforum_location', $this->user->data['user_rt_viewforum_location']),
-			'rt_number'          => $this->request->variable('rt_number', (int) $this->user->data['user_rt_number']),
+			'rt_location'        => $this->valid_location(
+				$this->request->variable('rt_location', $this->user->data['user_rt_location']),
+				self::LOCATIONS, $this->user->data['user_rt_location'], $this->config['rt_location']
+			),
+			'rt_viewforum_location' => $this->valid_location(
+				$this->request->variable('rt_viewforum_location', $this->user->data['user_rt_viewforum_location']),
+				self::VIEWFORUM_LOCATIONS, $this->user->data['user_rt_viewforum_location'], $this->config['rt_viewforum_location']
+			),
+			'rt_number'          => max(self::NUMBER_MIN, min(self::NUMBER_MAX,
+				$this->request->variable('rt_number', (int) $this->user->data['user_rt_number'])
+			)),
 			'rt_sort_start_time' => $this->request->variable('rt_sort_start_time', (int) $this->user->data['user_rt_sort_start_time']),
 			'rt_unread_only'     => $this->request->variable('rt_unread_only', (int) $this->user->data['user_rt_unread_only']),
 			)
@@ -272,6 +290,30 @@ class ucp_listener implements EventSubscriberInterface
 		}
 
 		$event['sql_ary'] = array_merge($event['sql_ary'], $sql_ary);
+	}
+
+	/**
+	 * Return a submitted block location if it is one of the allowed options (issue #198).
+	 *
+	 * Otherwise keep the user's stored location, or use the board default if that is not valid either.
+	 *
+	 * @param  string $submitted Location from the request
+	 * @param  array  $allowed   Valid locations for this setting
+	 * @param  string $stored    The user's current location
+	 * @param  string $default   The board-wide default location
+	 * @return string
+	 */
+	private function valid_location($submitted, array $allowed, $stored, $default)
+	{
+		foreach ([$submitted, $stored, $default] as $location)
+		{
+			if (in_array($location, $allowed, true))
+			{
+				return $location;
+			}
+		}
+
+		return $allowed[0];
 	}
 
 	/**
