@@ -2,6 +2,8 @@
 
 - 3.0.12 (04/10/2026) — bugfix release
 
+  Upgrading: disable the extension, replace the files, enable it again. Enabling runs the 3.0.12 migration; a plain file swap does not.
+
   New features
   - [NEW] ACP option "Show announcements first": the announcements and global announcements on each page of the list move to the top of that page. Only topics already on the page move, so older announcements are not pulled back in; off by default (#201)
 
@@ -17,7 +19,7 @@
 
   Housekeeping
   - [CHANGE] The ACP "Become a patron" button is bundled with the extension instead of loaded from Patreon's servers on every ACP page view (#200)
-  - [CHANGE] New `release_3_0_12` migration adds the `rt_announcements_first` setting
+  - [CHANGE] New `release_3_0_12` migration adds the `rt_announcements_first` setting and clears the permission cache once, so boards that enabled an earlier 3.0.x and were hit by #194 recover on upgrade
   - [CHANGE] Unit tests for the forum list, the page count, like counts, announcement ordering, the UCP checks and the language packs; functional tests for the ACP settings
 
 - 3.0.11 (10/08/2026) — validation release

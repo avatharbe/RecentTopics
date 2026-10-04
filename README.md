@@ -60,6 +60,12 @@ prosilver, pbTech, pbWow3, WE Clearblue
 4. Navigate in the ACP to `Customise -> Manage extensions`.
 5. Find `Recent Topics` under "Disabled Extensions" and click `Enable`.
 
+#### Upgrading
+1. Navigate in the ACP to `Customise -> Manage extensions` and click `Disable` for `Recent Topics` (do not delete its data).
+2. Replace the files in `/ext/avathar/recenttopics/` with the new release.
+3. Click `Enable` for `Recent Topics`. Enabling runs the new version's database migrations, so a plain file swap is not enough.
+4. Purge the cache (`General -> Purge the cache`).
+
 #### Uninstallation
 1. Navigate in the ACP to `Customise -> Manage extensions`.
 2. Click the `Disable` link for `Recent Topics`.
