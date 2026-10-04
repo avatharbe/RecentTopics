@@ -55,7 +55,7 @@
 							{% if S_POSTLOVE and recent_topics.TOPIC_LIKES %}<span class="rt-likes"><i class="icon fa-heart fa-fw icon-red" aria-hidden="true"></i> {{ recent_topics.TOPIC_LIKES }}</span>{% endif %}
 							<a href="{{ recent_topics.U_LAST_POST }}" title="{{ lang('GOTO_LAST_POST')|e('html_attr') }}">
 								<i class="icon fa-external-link-square fa-fw {% if recent_topics.S_UNREAD_TOPIC and not S_IS_BOT %}icon-red icon-md{% else %}icon-lightgrey icon-md{% endif %}" aria-hidden="true"></i>
-								<span class="sr-only">{{ VIEW_LATEST_POST }}</span>
+								<span class="sr-only">{{ lang('GOTO_LAST_POST') }}</span>
 							</a>
 						</span>
 				</dd>
