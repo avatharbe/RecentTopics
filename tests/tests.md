@@ -51,6 +51,8 @@ tests/
 │   └── recenttopics_events_test.php   Public event API contract (contrib/events.md)
 ├── language/
 │   └── viewonline_lang_test.php   Who Is Online label in every language pack
+├── template/
+│   └── template_vars_test.php     No unassigned template variables in shipped templates
 └── functional/
     └── recenttopics_test.php      End-to-end browser tests
 ```
@@ -257,7 +259,21 @@ It runs `fill_template()` on one page of four topics in time order (normal, anno
 
 ---
 
-## 11. Functional tests (`functional/recenttopics_test.php`)
+## 11. Template variables (`template/template_vars_test.php`)
+
+**What this code does:**
+The topic-list templates in `styles/*/template/` render a hidden screen-reader label inside each last-post link.
+
+**What this test file does:**
+It reads every `.html` template the extension ships (one data-provider row per file) and checks it for variables the PHP never assigns.
+
+| Test | Scenario | What it verifies |
+|------|----------|-----------------|
+| `test_no_unassigned_view_latest_post` | Every template file | No `VIEW_LATEST_POST`. It was never assigned, so the last-post link's screen-reader label rendered empty; the templates now use `lang('GOTO_LAST_POST')`, matching the link's title (#215) |
+
+---
+
+## 12. Functional tests (`functional/recenttopics_test.php`)
 
 **What this code does:**
 These tests start a real phpBB installation (using the test framework's built-in install), enable the extension, and make HTTP requests using a real browser-like crawler (Symfony DomCrawler). They check the actual rendered HTML for specific elements.
