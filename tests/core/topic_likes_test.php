@@ -138,9 +138,14 @@ class topic_likes_test extends \phpbb_test_case
 			$property->setValue($rt, $value);
 		}
 
+		// phpBB's real censor_text() (loaded by the test bootstrap) reads global $config, $user and
+		// $auth. allow_nocensors = 1 with acl_get() = true leaves the text untouched.
 		$GLOBALS['phpbb_dispatcher'] = $dispatcher;
 		$GLOBALS['config'] = ['allow_smilies' => 0, 'allow_nocensors' => 1];
 		$GLOBALS['user'] = $user;
+		$auth_global = $this->createMock(\phpbb\auth\auth::class);
+		$auth_global->method('acl_get')->willReturn(true);
+		$GLOBALS['auth'] = $auth_global;
 
 		return $rt;
 	}
