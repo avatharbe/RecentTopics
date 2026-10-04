@@ -59,6 +59,8 @@ $lang = array_merge(
 		'RT_PAGE_NUMBERMAX_EXP'         => 'Stel het maximum aantal pagina’s in.',
 		'RT_MIN_TOPIC_LEVEL'            => 'Onderwerptypes',
 		'RT_MIN_TOPIC_LEVEL_EXP'        => 'Stel het minimum weer te geven onderwerptype in.',
+		'RT_ANNOUNCEMENTS_FIRST'        => 'Mededelingen eerst tonen',
+		'RT_ANNOUNCEMENTS_FIRST_EXP'    => 'Plaatst de mededelingen en algemene mededelingen op elke pagina van de lijst bovenaan die pagina. Oudere mededelingen die niet op de pagina staan, worden niet toegevoegd.',
 		'RT_ANTI_TOPICS'                => 'Uitgesloten onderwerpen',
 		'RT_ANTI_TOPICS_EXP'            => 'Vul de onderwerp id’s in (bijvoorbeeld 7,9), anders 0. (deze nummers vind je in de url viewtopic.php?t=12345)',
 		'RT_PARENTS'                    => 'Weergeven van hoofdforums',

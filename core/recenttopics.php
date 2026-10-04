@@ -469,6 +469,33 @@ class recenttopics
 	}
 
 	/**
+	 * Put a page's announcements and global announcements ahead of its other topics.
+	 *
+	 * Only the rows already on this page move, so old announcements never come back into the
+	 * list. Both groups keep their existing (time) order; stickies stay with the normal topics.
+	 *
+	 * @param  array $rowset Topic rows for the current page, as returned by get_topics_sql()
+	 * @return array The same rows, announcements first
+	 */
+	private function announcements_first(array $rowset): array
+	{
+		$announcements = $others = [];
+		foreach ($rowset as $row)
+		{
+			if (in_array((int) $row['topic_type'], [POST_ANNOUNCE, POST_GLOBAL], true))
+			{
+				$announcements[] = $row;
+			}
+			else
+			{
+				$others[] = $row;
+			}
+		}
+
+		return array_merge($announcements, $others);
+	}
+
+	/**
 	 * Narrow the board's forums down to the ones this list may draw topics from.
 	 *
 	 * Two passes: first the forums the user may see at all, then a query dropping any whose
@@ -785,6 +812,12 @@ class recenttopics
 		// get topics from db
 		$rowset = $this->get_topics_sql();
 		$topic_icons = array();
+
+		// Move this page's announcements and global announcements to its top (issue #201)
+		if (!empty($this->config['rt_announcements_first']))
+		{
+			$rowset = $this->announcements_first($rowset);
+		}
 
 		// Get postlove like counts if installed and switched on in the ACP
 		$topic_likes = [];
