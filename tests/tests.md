@@ -46,6 +46,8 @@ tests/
 │   ├── topic_count_test.php       "Show all pages" count uses the forum list
 │   ├── topic_likes_test.php       ACP "Show like counts" setting
 │   └── recenttopics_events_test.php   Public event API contract (contrib/events.md)
+├── language/
+│   └── viewonline_lang_test.php   Who Is Online label in every language pack
 └── functional/
     └── recenttopics_test.php      End-to-end browser tests
 ```
@@ -208,7 +210,21 @@ It runs `fill_template()` for one topic with a stand-in Post Love service that r
 
 ---
 
-## 8. Functional tests (`functional/recenttopics_test.php`)
+## 8. Who Is Online label (`language/viewonline_lang_test.php`)
+
+**What this code does:**
+When someone is on `/app.php/rt` or `/app.php/rt/simple`, the listener sets their Who Is Online location to `VIEWING_RECENT_TOPICS` and the link to the page. Core's `viewonline_body.html` wraps that label in its own `<a href="{U_FORUM_LOCATION}">`.
+
+**What this test file does:**
+It loads `recenttopics.php` from every language pack and checks that `VIEWING_RECENT_TOPICS` is plain text: no HTML and no `%` placeholder.
+
+| Test | Scenario | What it verifies |
+|------|----------|-----------------|
+| `test_viewing_recent_topics_is_plain_text` | Data provider: one row per language pack | The label has no `<` and no `%`. The packs used to carry `<a href="%s">…</a>`, which nested a link with an unfilled `%s` inside core's link (#199) |
+
+---
+
+## 9. Functional tests (`functional/recenttopics_test.php`)
 
 **What this code does:**
 These tests start a real phpBB installation (using the test framework's built-in install), enable the extension, and make HTTP requests using a real browser-like crawler (Symfony DomCrawler). They check the actual rendered HTML for specific elements.

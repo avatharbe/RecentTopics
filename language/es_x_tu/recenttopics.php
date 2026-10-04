@@ -23,7 +23,7 @@ $lang = array_merge(
 	'RECENT_TOPICS'    => 'Temas Recientes',
 	'RT_NO_TOPICS'		=> 'No hay nuevos temas que mostrar.',
 	'LIKES'				=> 'Me gusta',
-	'VIEWING_RECENT_TOPICS'	=> 'Viendo <a href="%s">Temas Recientes</a>',
+	'VIEWING_RECENT_TOPICS'	=> 'Viendo Temas Recientes',
 	'EXTENSION_REQUIRES_330'	=> 'Esta extensión requiere phpBB 3.3.0 o superior.',
 
 	// is_enableable() error messages

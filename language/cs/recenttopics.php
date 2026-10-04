@@ -22,7 +22,7 @@ $lang = array_merge(
 	'RECENT_TOPICS'    => 'Nedávná témata',
 	'RT_NO_TOPICS'		=> 'Žádná nedávná témata.',
 	'LIKES'				=> 'Lajky',
-	'VIEWING_RECENT_TOPICS'	=> 'Prohlíží <a href="%s">Nedávná témata</a>',
+	'VIEWING_RECENT_TOPICS'	=> 'Prohlíží Nedávná témata',
 	'EXTENSION_REQUIRES_330'	=> 'Tato extenze vyžaduje phpBB 3.3.0 nebo vyšší.',
 
 	// is_enableable() error messages

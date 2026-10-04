@@ -24,7 +24,7 @@ $lang = array_merge(
 	'RECENT_TOPICS'     => 'Senaste trådar',
 	'RT_NO_TOPICS'		=> 'Det finns inga nya trådar att visa.',
 	'LIKES'				=> 'Gillningar',
-	'VIEWING_RECENT_TOPICS'	=> 'Visar <a href="%s">Senaste trådar</a>',
+	'VIEWING_RECENT_TOPICS'	=> 'Visar Senaste trådar',
 	'EXTENSION_REQUIRES_330'	=> 'Detta tillägg kräver phpBB 3.3.0 eller högre.',
 
 	// is_enableable() error messages

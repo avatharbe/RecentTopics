@@ -23,7 +23,7 @@ $lang = array_merge(
 	'RECENT_TOPICS'     => 'Najnovšie témy',
 	'RT_NO_TOPICS'		=> 'Nie sú žiadne nové témy na zobrazenie.',
 	'LIKES'				=> 'Lajky',
-	'VIEWING_RECENT_TOPICS'	=> 'Prezerá <a href="%s">Najnovšie témy</a>',
+	'VIEWING_RECENT_TOPICS'	=> 'Prezerá Najnovšie témy',
 	'EXTENSION_REQUIRES_330'	=> 'Toto rozšírenie vyžaduje phpBB 3.3.0 alebo vyššie.',
 
 	// is_enableable() error messages
