@@ -100,7 +100,7 @@ class ucp_listener implements EventSubscriberInterface
 		return array(
 		'core.ucp_prefs_view_data'        => 'ucp_prefs_get_data',
 		'core.ucp_prefs_view_update_data' => 'ucp_prefs_set_data',
-		'core.ucp_register_data_after'		  => 'ucp_register_set_data'
+		'core.ucp_register_register_after' => 'ucp_register_set_data'
 		);
 	}
 
@@ -277,8 +277,9 @@ class ucp_listener implements EventSubscriberInterface
 	/**
 	 * set a newly registered account's Recent Topics preferences from default.
 	 *
-	 * Fired after the user row has been inserted, so the user_rt_* columns are written by a second
-	 * UPDATE of our own rather than merged into an existing $sql_ary.
+	 * Listens to core.ucp_register_register_after, which fires after user_add() has inserted the row
+	 * and carries the new user_id, so the user_rt_* columns are written by a second UPDATE of our own.
+	 * core.ucp_register_data_after fires during form validation with no user_id (issue #196).
 	 *
 	 * @param  \phpbb\event\data $event Event object; reads ['user_id']
 	 * @return void
