@@ -153,6 +153,12 @@ class rt_perms extends \phpbb\db\migration\migration
 				}
 			}
 		}
+
+		// The raw inserts above bypass the migrator's permission tools, which would clear each
+		// user's cached permission set. Clear it here, as core's remove_orphaned_roles migration
+		// does, or existing users keep a set without u_rt_view (issue #194).
+		$auth = new \phpbb\auth\auth();
+		$auth->acl_clear_prefetch();
 	}
 
 	public function revert_data()
