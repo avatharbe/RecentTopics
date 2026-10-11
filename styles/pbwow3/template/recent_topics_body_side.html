@@ -53,7 +53,7 @@
 					{% if recent_topics.S_TOPIC_UNAPPROVED or recent_topics.S_POSTS_UNAPPROVED %}<a href="{{ recent_topics.U_MCP_QUEUE }}">
 						<i class="icon fa-question fa-fw icon-blue" aria-hidden="true"></i><span class="sr-only"></span></a>
 					{% endif %}
-					{% if recent_topics.S_TOPIC_DELETED %}<a href="{{ recent_topics.U_MCP_QUEUE }}"></a>{% endif %}
+					{% if recent_topics.S_TOPIC_DELETED %}<a href="{{ recent_topics.U_MCP_QUEUE }}" title="{{ lang('TOPIC_DELETED') }}"><i class="icon fa-recycle fa-fw icon-green" aria-hidden="true"></i><span class="sr-only">{{ lang('TOPIC_DELETED') }}</span></a>{% endif %}
 					{% if recent_topics.S_TOPIC_REPORTED %}<a href="{{ recent_topics.U_MCP_REPORT }}"><i class="icon fa-exclamation fa-fw icon-red" aria-hidden="true"></i><span class="sr-only"></span></a>{% endif %}<br />
 					{% if recent_topics.ATTACH_ICON_IMG %}<i class="icon fa-paperclip fa-fw" aria-hidden="true"></i>{% endif %}
 				</dd>

@@ -905,6 +905,8 @@ class recenttopics
 				$topic_unapproved = ($row['topic_visibility'] == ITEM_UNAPPROVED && $this->auth->acl_get('m_approve', $forum_id));
 				$posts_unapproved = ($row['topic_visibility'] == ITEM_APPROVED && $row['topic_posts_unapproved'] && $this->auth->acl_get('m_approve', $forum_id));
 				$u_mcp_queue   = ($topic_unapproved || $posts_unapproved) ? append_sid("{$this->root_path}mcp.$this->phpEx", 'i=queue&amp;mode=' . ($topic_unapproved ? 'approve_details' : 'unapproved_posts') . "&amp;t=$topic_id", true, $this->user->session_id) : '';
+				$topic_deleted = $row['topic_visibility'] == ITEM_DELETED;
+				$u_mcp_queue   = (!$u_mcp_queue && $topic_deleted) ? append_sid("{$this->root_path}mcp.$this->phpEx", 'i=queue&amp;mode=deleted_topics&amp;t=' . $topic_id, true, $this->user->session_id) : $u_mcp_queue;
 				$s_type_switch = ($row['topic_type'] == POST_ANNOUNCE || $row['topic_type'] == POST_GLOBAL) ? 1 : 0;
 
 				if (!empty($this->icons[$row['icon_id']]))
@@ -972,6 +974,7 @@ class recenttopics
 					'S_TOPIC_REPORTED'    => $row['topic_reported'] && $this->auth->acl_get('m_report', $forum_id),
 					'S_TOPIC_UNAPPROVED'  => $topic_unapproved,
 					'S_POSTS_UNAPPROVED'  => $posts_unapproved,
+					'S_TOPIC_DELETED'     => $topic_deleted,
 					'S_POST_ANNOUNCE'     => $row['topic_type'] == POST_ANNOUNCE,
 					'S_POST_GLOBAL'       => $row['topic_type'] == POST_GLOBAL,
 					'S_POST_STICKY'       => $row['topic_type'] == POST_STICKY,
