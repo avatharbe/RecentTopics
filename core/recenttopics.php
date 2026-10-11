@@ -231,7 +231,7 @@ class recenttopics
 		$root_path,
 		$phpEx,
 		db_text $config_text,
-		?\phpbb\collapsiblecategories\operator\operator $collapsable_categories = null,
+		\phpbb\collapsiblecategories\operator\operator|null $collapsable_categories = null,
 		$topic_likes_service = null
 	)
 	{
