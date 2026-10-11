@@ -281,7 +281,7 @@ class ucp_listener_test extends \phpbb_test_case
 	 * Submitted location / number preferences, and what must reach $event['data'] (#198).
 	 * Stored user values: location RT_BOTTOM, viewforum location RT_TOP, number 5.
 	 */
-	public function submitted_preferences_data()
+	public static function submitted_preferences_data()
 	{
 		return array(
 			'valid values pass through'           => array('RT_SIDE', 'RT_BOTTOM', 20, 'RT_SIDE', 'RT_BOTTOM', 20),

@@ -17,7 +17,7 @@ class viewonline_lang_test extends \phpbb_test_case
 	/**
 	 * One row per language pack shipped with the extension.
 	 */
-	public function language_data()
+	public static function language_data()
 	{
 		$data = [];
 		foreach (glob(__DIR__ . '/../../language/*/recenttopics.php') as $file)

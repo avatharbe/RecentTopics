@@ -3,16 +3,16 @@ name: Tests
 on:
   push:
     branches:
-      - develop33
+      - develop40
   pull_request:
     branches:
-      - develop33
+      - develop40
 
 jobs:
   test:
-    uses: phpbb-extensions/test-framework/.github/workflows/tests.yml@3.3.x
+    uses: phpbb-extensions/test-framework/.github/workflows/tests.yml@master
     with:
       EXTNAME: 'avathar/recenttopics'
-      PRIMARY_PHP_VERSION: '8.1'
-      PHP_VERSION_MATRIX: '["8.1", "8.2", "8.3", "8.4"]'
+      PRIMARY_PHP_VERSION: '8.2'
+      PHP_VERSION_MATRIX: '["8.2", "8.3", "8.4", "8.5"]'
       RUN_MSSQL_JOBS: 0

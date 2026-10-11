@@ -17,7 +17,7 @@ class anti_topics_test extends \phpbb_test_case
 	/**
 	 * Raw ACP input => value to store, or null when the input must be rejected.
 	 */
-	public function anti_topics_data()
+	public static function anti_topics_data()
 	{
 		return [
 			'single id'                    => ['7', '7'],

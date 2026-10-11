@@ -90,7 +90,7 @@ class listener_test extends \phpbb_test_case
 		$this->listener->display_rt();
 	}
 
-	public function viewonline_data()
+	public static function viewonline_data()
 	{
 		return array(
 			'rt_page' => array(
@@ -245,7 +245,7 @@ class listener_test extends \phpbb_test_case
 		$this->assertEquals('misc', $permissions['u_rt_view']['cat']);
 	}
 
-	public function topictitle_remove_re_data()
+	public static function topictitle_remove_re_data()
 	{
 		return array(
 			'with_re_prefix' => array(

@@ -17,7 +17,7 @@ class template_vars_test extends \phpbb_test_case
 	/**
 	 * One row per template file the extension ships.
 	 */
-	public function template_data()
+	public static function template_data()
 	{
 		$root = dirname(__DIR__, 2) . '/styles';
 		$data = [];
