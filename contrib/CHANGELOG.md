@@ -1,5 +1,10 @@
 ### Changelog
 
+- 3.0.13 (unreleased) — bugfix release
+
+  Fixes
+  - [FIX] Moderators see the green recycle icon on soft-deleted topics, linking to the deleted-topics queue. `S_TOPIC_DELETED` was checked by the templates but never assigned, and the templates rendered an empty link for it
+
 - 3.0.12 (04/10/2026) — bugfix release
 
   Upgrading: disable the extension, replace the files, enable it again. Enabling runs the 3.0.12 migration; a plain file swap does not.
