@@ -15,9 +15,9 @@ namespace avathar\recenttopics;
  */
 class ext extends \phpbb\extension\base
 {
-	const RT_VERSION = '3.0.12';
-	const MIN_PHP_VERSION = '8.1.0';
-	const MIN_PHPBB_VERSION = '3.3.0';
+	const RT_VERSION = '4.0.0-dev';
+	const MIN_PHP_VERSION = '8.2.0';
+	const MIN_PHPBB_VERSION = '4.0.0-dev';
 
 	/**
 	 * Check whether the extension can be enabled.

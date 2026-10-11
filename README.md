@@ -1,4 +1,4 @@
-Recent Topics for phpBB 3.3
+Recent Topics for phpBB 4.0
 ===========
 
 [![Tests](https://github.com/avatharbe/RecentTopics/actions/workflows/tests.yml/badge.svg)](https://github.com/avatharbe/RecentTopics/actions/workflows/tests.yml)
@@ -7,11 +7,14 @@ Recent Topics for phpBB 3.3
 Extension for phpBB to display recent topics on the index page.
 Originally based on NV Recent Topics by Joas Schilling ([nickvergessen](https://github.com/nickvergessen)), later maintained by PayBas. Now maintained by [avathar](https://www.avathar.be).
 
-**Version:** 3.0.12 (04/10/2026)
+**Version:** 4.0.0-dev (in development)
+
+> This is the phpBB 4.0 line, developed on the `develop40` branch alongside phpBB 4.0 itself and not yet released.
+> For phpBB 3.3 use Recent Topics 3.0.x from the `develop33` branch.
  
 #### Requirements
-- phpBB 3.3.0 or higher 
-- PHP 8.1 or higher
+- phpBB 4.0
+- PHP 8.2 or higher
 
 #### Features
 - Recent (or unread) topics list on the index page and viewforum page
@@ -51,7 +54,7 @@ For extension developers: custom PHP events, deprecated event aliases, and integ
 English, German, German (formal), French, Dutch, Spanish, Spanish (informal), Czech, Slovak, Russian, Portuguese, Arabic, Ukrainian, Swedish
 
 #### Tested on
-prosilver, pbTech, pbWow3, WE Clearblue
+prosilver (phpBB 4.0.0-a3-dev). The pbTech, pbWoW3 and WE Clearblue templates are still the phpBB 3.3 versions and have not been ported to phpBB 4.0.
 
 #### Installation
 1. Disable, delete data and remove the extension paybas/recenttopics if previously installed.

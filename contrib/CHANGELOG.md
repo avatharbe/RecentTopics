@@ -1,5 +1,19 @@
 ### Changelog
 
+- 4.0.0-dev (unreleased) — phpBB 4.0 port
+
+  Requires phpBB 4.0 and PHP 8.2. phpBB 3.3 boards stay on the 3.0.x line.
+
+  Changes
+  - [CHANGE] Topic and status icons are rendered with phpBB 4.0's `Icon()` Twig function. phpBB 4.0 dropped prosilver's background folder icons and the Font Awesome 4 `.icon fa-*` classes, so rows showed no topic icon and the inline icons were blank
+  - [CHANGE] Topic rows show the phpBB 4.0 SVG topic icon (normal, sticky, announcement, global, locked, moved, hot) with the "your topic" marker, from the new shared `rt_row_icon.html`
+  - [CHANGE] The unapproved, deleted and reported icons come from the new shared `rt_status_icons.html`; the deleted-topic link, previously empty, now has an icon
+  - [CHANGE] Unread topics: the title links to the first unread post, as in core, instead of a separate red unread icon
+  - [CHANGE] Attachment, poll, multi-page, last-post, like and pagination icons use Font Awesome 6 names
+  - [CHANGE] New `S_TOPIC_HOT` template variable, using core's hot topic threshold
+  - [CHANGE] Side view: the topic icon is centred on the title so it no longer covers the last post line
+  - [CHANGE] Minimum versions raised to phpBB 4.0 and PHP 8.2
+
 - 3.0.12 (04/10/2026) — bugfix release
 
   Upgrading: disable the extension, replace the files, enable it again. Enabling runs the 3.0.12 migration; a plain file swap does not.
