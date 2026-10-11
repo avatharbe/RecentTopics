@@ -81,6 +81,11 @@
     position: relative;
 }
 
+/* Centre the topic icon on the title block, not the whole row, so it clears the last post line */
+#recent-topics dl.row-item > dt {
+    position: relative;
+}
+
 #recent-topics dd.status-icons {
     position: absolute;
     top: 3px;
@@ -106,5 +111,9 @@
 #recent-topics .rt-likes {
     font-size: 0.85em;
     white-space: nowrap;
+}
+
+#recent-topics .rt-likes .o-icon {
+    color: #d41142;
 }
 

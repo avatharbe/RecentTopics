@@ -1,0 +1,16 @@
+{# Moderation status icons for a recent_topics row, as rendered by prosilver's viewforum_body.html #}
+{% if recent_topics.S_TOPIC_UNAPPROVED or recent_topics.S_POSTS_UNAPPROVED %}
+	<a href="{{ recent_topics.U_MCP_QUEUE }}" title="{% if recent_topics.S_TOPIC_UNAPPROVED %}{{ lang('TOPIC_UNAPPROVED') }}{% else %}{{ lang('POSTS_UNAPPROVED') }}{% endif %}">
+		{{ Icon('font', 'circle-question', '', true, 'fas c-unapproved-icon o-icon-baseline') }}<span class="sr-only">{% if recent_topics.S_TOPIC_UNAPPROVED %}{{ lang('TOPIC_UNAPPROVED') }}{% else %}{{ lang('POSTS_UNAPPROVED') }}{% endif %}</span>
+	</a>
+{% endif %}
+{% if recent_topics.S_TOPIC_DELETED %}
+	<a href="{{ recent_topics.U_MCP_QUEUE }}" title="{{ lang('TOPIC_DELETED') }}">
+		{{ Icon('font', 'recycle', lang('TOPIC_DELETED'), true, 'fas c-topic-deleted-icon o-icon-baseline') }}
+	</a>
+{% endif %}
+{% if recent_topics.S_TOPIC_REPORTED %}
+	<a href="{{ recent_topics.U_MCP_REPORT }}" title="{{ lang('TOPIC_REPORTED') }}">
+		{{ Icon('font', 'triangle-exclamation', lang('TOPIC_REPORTED'), true, 'fas c-topic-reported-icon o-icon-baseline') }}
+	</a>
+{% endif %}

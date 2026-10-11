@@ -978,6 +978,7 @@ class recenttopics
 					'S_TOPIC_LOCKED'      => $row['topic_status'] == ITEM_LOCKED,
 					'S_USER_POSTED'       => (isset($row['topic_posted']) && $row['topic_posted']) ? true : false,
 					'S_TOPIC_MOVED'       => $row['topic_status'] == ITEM_MOVED,
+					'S_TOPIC_HOT'         => $this->config['hot_threshold'] && ($replies + 1) >= $this->config['hot_threshold'] && $row['topic_status'] != ITEM_LOCKED,
 					'S_TOPIC_TYPE_SWITCH' => ($s_type_switch == $s_type_switch_test) ? -1 : $s_type_switch_test,
 					'U_NEWEST_POST' => $view_topic_url . '&amp;view=unread#unread',
 					'U_LAST_POST'   => $view_topic_url . '&amp;p=' . $row['topic_last_post_id'] . '#p' . $row['topic_last_post_id'],

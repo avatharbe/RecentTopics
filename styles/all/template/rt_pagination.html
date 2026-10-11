@@ -1,7 +1,7 @@
 <ul>
 {% if BASE_URL and TOTAL_PAGES > 6 %}
 	<li class="dropdown-container dropdown-button-control dropdown-page-jump page-jump">
-		<a class="button button-icon-only dropdown-trigger" href="#" title="{{ lang('JUMP_TO_PAGE_CLICK') }}" role="button"><i class="icon fa-level-{% if S_CONTENT_DIRECTION == 'rtl' %}up{% else %}down{% endif %} fa-rotate-270" aria-hidden="true"></i><span class="sr-only">{{ PAGE_NUMBER }}</span></a>
+		<a class="button button-icon-only dropdown-trigger" href="#" title="{{ lang('JUMP_TO_PAGE_CLICK') }}" role="button">{{ Icon('font', 'turn-down', PAGE_NUMBER, true, 'fas fa-rotate-270 c-button-icon c-pagination-icon') }}</a>
 		<div class="dropdown">
 			<div class="pointer"><div class="pointer-inner"></div></div>
 			<ul class="dropdown-contents">
@@ -16,15 +16,13 @@
 {% endif %}
 {% for rt_pagination in loops.rt_pagination %}
 	{% if rt_pagination.S_IS_PREV %}
-		<li class="arrow previous"><a class="button button-icon-only" href="{{ rt_pagination.PAGE_URL }}" rel="prev" role="button">
-			<i class="icon fa-chevron-{% if S_CONTENT_DIRECTION == 'rtl' %}right{% else %}left{% endif %} fa-fw" aria-hidden="true"></i><span class="sr-only">{{ lang('PREVIOUS') }}</span></a></li>
+		<li class="arrow previous"><a class="button button-icon-only" href="{{ rt_pagination.PAGE_URL }}" rel="prev" role="button">{{ Icon('font', 'chevron-' ~ S_CONTENT_FLOW_BEGIN, lang('PREVIOUS'), true, 'fas c-button-icon c-pagination-icon') }}</a></li>
 	{% elseif rt_pagination.S_IS_CURRENT %}
 	<li class="active"><span>{{ rt_pagination.PAGE_NUMBER }}</span></li>
 	{% elseif rt_pagination.S_IS_ELLIPSIS %}
 	<li class="ellipsis" role="separator"><span>{{ lang('ELLIPSIS') }}</span></li>
 	{% elseif rt_pagination.S_IS_NEXT %}
-		<li class="arrow next"><a class="button button-icon-only" href="{{ rt_pagination.PAGE_URL }}" rel="next" role="button">
-			<i class="icon fa-chevron-{% if S_CONTENT_DIRECTION == 'rtl' %}left{% else %}right{% endif %} fa-fw" aria-hidden="true"></i><span class="sr-only">{{ lang('NEXT') }}</span></a></li>
+		<li class="arrow next"><a class="button button-icon-only" href="{{ rt_pagination.PAGE_URL }}" rel="next" role="button">{{ Icon('font', 'chevron-' ~ S_CONTENT_FLOW_END, lang('NEXT'), true, 'fas c-button-icon c-pagination-icon') }}</a></li>
 	{% else %}
 		<li><a class="button" href="{{ rt_pagination.PAGE_URL }}" role="button">{{ rt_pagination.PAGE_NUMBER }}</a></li>
 	{% endif %}

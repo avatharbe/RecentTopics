@@ -38,23 +38,20 @@
             {% endif %}
             <li class="row{% if recent_topics.S_ROW_COUNT is even %} bg1{% else %} bg2{% endif %}{% if recent_topics.S_POST_GLOBAL %} global-announce{% endif %}{% if recent_topics.S_POST_ANNOUNCE %} announce{% endif %}{% if recent_topics.S_POST_STICKY %} sticky{% endif %}{% if recent_topics.S_TOPIC_REPORTED %} reported{% endif %}">
 
-                <dl class="row-item {{ recent_topics.TOPIC_IMG_STYLE }}">
-                    <dt{% if recent_topics.TOPIC_ICON_IMG and S_TOPIC_ICONS %} style="background-image: url({{ T_ICONS_PATH }}{{ recent_topics.TOPIC_ICON_IMG }}); background-repeat: no-repeat;"{% endif %} title="{{ recent_topics.TOPIC_FOLDER_IMG_ALT }}">
-                    {% if recent_topics.S_UNREAD_TOPIC and not S_IS_BOT %}<a href="{{ recent_topics.U_NEWEST_POST }}" class="row-item-link"></a>{% endif %}
-                    <div class="list-inner">
-                        {% EVENT topiclist_row_prepend %}
-                        {% if recent_topics.S_UNREAD_TOPIC and not S_IS_BOT %}
-                        <a href="{{ recent_topics.U_NEWEST_POST }}">
-                            <i class="icon fa-file fa-fw icon-red icon-md" aria-hidden="true"></i><span class="sr-only"></span>
-                        </a> {% endif %}<a href="{{ recent_topics.U_VIEW_TOPIC }}" class="topictitle">{{ recent_topics.TOPIC_TITLE }}</a>
+                <dl class="row-item">
+                    <dt title="{{ recent_topics.TOPIC_FOLDER_IMG_ALT }}">
+{% include '@avathar_recenttopics/rt_row_icon.html' %}
+<div class="list-inner">
+    {% EVENT topiclist_row_prepend %}
+    {% if recent_topics.S_UNREAD_TOPIC and not S_IS_BOT %}
+    <a href="{{ recent_topics.U_NEWEST_POST }}" class="topictitle unread">{{ recent_topics.TOPIC_TITLE }}</a>
+    {%- else -%}
+    <a href="{{ recent_topics.U_VIEW_TOPIC }}" class="topictitle">{{ recent_topics.TOPIC_TITLE }}</a>
+    {%- endif %}
 
-                        {% if recent_topics.ATTACH_ICON_IMG %}<i class="icon fa-paperclip fa-fw" aria-hidden="true"></i>{% endif %}
+    {% if recent_topics.ATTACH_ICON_IMG %}{{ Icon('font', 'paperclip', '', true) }}{% endif %}
 
-                        {% if recent_topics.S_TOPIC_UNAPPROVED or recent_topics.S_POSTS_UNAPPROVED %}<a href="{{ recent_topics.U_MCP_QUEUE }}">
-                        <i class="icon fa-question fa-fw icon-blue" aria-hidden="true"></i><span class="sr-only"></span></a>
-                        {% endif %}
-                        {% if recent_topics.S_TOPIC_DELETED %}<a href="{{ recent_topics.U_MCP_QUEUE }}"></a> {% endif %}
-                        {% if recent_topics.S_TOPIC_REPORTED %}<a href="{{ recent_topics.U_MCP_REPORT }}"><i class="icon fa-exclamation fa-fw icon-red" aria-hidden="true"></i><span class="sr-only"></span></a>{% endif %}<br />
+    {% include '@avathar_recenttopics/rt_status_icons.html' %}<br />
 
                         {% if not S_IS_BOT %}
                         <div class="responsive-show" style="display: none;">
@@ -66,9 +63,7 @@
 
                         {% if recent_topics.pagination|length %}
                         <div class="pagination">
-							<span>
-							<i class="icon fa-clone fa-fw" aria-hidden="true">	</i>
-							</span>
+							<span>{{ Icon('font', 'clone', '', true, 'far') }}</span>
                             <ul>
                                 {% for pagination in recent_topics.pagination %}
                                 {% if pagination.S_IS_PREV %}
@@ -83,7 +78,7 @@
                         {% endif %}
 
                         <div class="responsive-hide">
-                            {% if recent_topics.S_HAS_POLL %}<i class="icon fa-bar-chart fa-fw" aria-hidden="true"></i>{% endif %}
+                            {% if recent_topics.S_HAS_POLL %}{{ Icon('font', 'chart-bar', '', true) }}{% endif %}
                             {{ lang('POST_BY_AUTHOR') }} {% EVENT viewforum_body_topic_author_username_prepend %} {{ recent_topics.TOPIC_AUTHOR_FULL }} {% EVENT viewforum_body_topic_author_username_append %} &raquo; {{ recent_topics.FIRST_POST_TIME }}
                             {% if recent_topics.S_POST_GLOBAL and FORUM_ID != recent_topics.FORUM_ID %} &raquo; {{ lang('IN') }} <a href="{{ recent_topics.U_VIEW_FORUM }}">{{ recent_topics.FORUM_NAME }}</a>
                             {% elseif recent_topics.U_VIEW_FORUM and recent_topics.FORUM_NAME %} &raquo; {{ lang('IN') }} {% for parent_forums in recent_topics.parent_forums %}<a href="{{ parent_forums.U_VIEW_FORUM }}">{{ parent_forums.FORUM_NAME }}</a> &raquo; {% endfor %}<a href="{{ recent_topics.U_VIEW_FORUM }}">{{ recent_topics.FORUM_NAME }}</a>{% endif %}
@@ -99,8 +94,7 @@
 						<span><dfn>{{ lang('LAST_POST') }} </dfn>{{ lang('POST_BY_AUTHOR') }} {% EVENT viewforum_body_last_post_author_username_prepend %} {{ recent_topics.LAST_POST_AUTHOR_FULL }} {% EVENT viewforum_body_last_post_author_username_append %}
 						{% if not S_IS_BOT %}
 							<a href="{{ recent_topics.U_LAST_POST }}" title="{{ lang('GOTO_LAST_POST')|e('html_attr') }}">
-								<i class="icon fa-external-link-square fa-fw icon-lightgray icon-md" aria-hidden="true"></i>
-								<span class="sr-only">{{ lang('GOTO_LAST_POST') }}</span>
+								{{ Icon('font', 'arrow-up-right-from-square', lang('GOTO_LAST_POST'), true, 'fas c-last-post-icon') }}
 							</a> {% endif %}<br />{{ recent_topics.LAST_POST_TIME }}
 						</span>
                     </dd>
