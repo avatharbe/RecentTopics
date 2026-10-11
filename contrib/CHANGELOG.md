@@ -13,6 +13,7 @@
   - [CHANGE] New `S_TOPIC_HOT` template variable, using core's hot topic threshold
   - [CHANGE] Side view: the topic icon is centred on the title so it no longer covers the last post line
   - [CHANGE] Minimum versions raised to phpBB 4.0 and PHP 8.2
+  - [CHANGE] pbWoW3 templates ported to phpBB 4.0: Font Awesome 4 icons replaced with `Icon()`, and the status icons now come from the shared `rt_status_icons.html`, which also gives pbWoW3 the deleted-topic icon. The rows keep pbWoW3's image folder icons (#222)
 
   Fixes
   - [FIX] Moderators see the recycle icon on soft-deleted topics, linking to the deleted-topics queue. `S_TOPIC_DELETED` was checked by the templates but never assigned (also fixed in 3.0.13)

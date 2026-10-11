@@ -54,7 +54,7 @@ For extension developers: custom PHP events, deprecated event aliases, and integ
 English, German, German (formal), French, Dutch, Spanish, Spanish (informal), Czech, Slovak, Russian, Portuguese, Arabic, Ukrainian, Swedish
 
 #### Tested on
-prosilver (phpBB 4.0.0-a3-dev). The pbTech, pbWoW3 and WE Clearblue templates are still the phpBB 3.3 versions and have not been ported to phpBB 4.0.
+prosilver (phpBB 4.0.0-a3-dev). The pbWoW3 templates are ported to phpBB 4.0 too, for the PBWoW3 4.0 port. The pbTech and WE Clearblue templates are still the phpBB 3.3 versions and have not been ported to phpBB 4.0.
 
 #### Installation
 1. Disable, delete data and remove the extension paybas/recenttopics if previously installed.
