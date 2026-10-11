@@ -117,27 +117,24 @@ class listener implements EventSubscriberInterface
 	/**
 	 * Show users viewing Recent Topics on the Who Is Online page.
 	 *
-	 * Without this the standalone rt pages are listed as a generic app route; the session page is
+	 * Without this the standalone rt pages are listed as the index page; the session page is
 	 * matched to name the location and link it back to the right controller.
 	 *
-	 * @param  \phpbb\event\data $event Event object; reads ['on_page'] and ['row'], writes ['location'] and ['location_url']
+	 * phpBB 4.0 serves routes through index.php, so the session page is index.php/rt or
+	 * index.php/rt/simple, optionally followed by a query string.
+	 *
+	 * @param  \phpbb\event\data $event Event object; reads ['row'], writes ['location'] and ['location_url']
 	 * @return void
 	 */
 	public function viewonline_overwrite_location($event)
 	{
-		if (isset($event['on_page'][1]) && $event['on_page'][1] === 'app')
+		if (!preg_match('#^index\.php/rt(/simple)?(?:[/?]|$)#', $event['row']['session_page'], $matches))
 		{
-			if (strpos($event['row']['session_page'], 'app.php/rt/simple') !== false)
-			{
-				$event['location'] = $this->language->lang('VIEWING_RECENT_TOPICS');
-				$event['location_url'] = $this->helper->route('avathar_recenttopics_simple');
-			}
-			else if (strpos($event['row']['session_page'], 'app.php/rt') !== false)
-			{
-				$event['location'] = $this->language->lang('VIEWING_RECENT_TOPICS');
-				$event['location_url'] = $this->helper->route('avathar_recenttopics_page');
-			}
+			return;
 		}
+
+		$event['location'] = $this->language->lang('VIEWING_RECENT_TOPICS');
+		$event['location_url'] = $this->helper->route(!empty($matches[1]) ? 'avathar_recenttopics_simple' : 'avathar_recenttopics_page');
 	}
 
 	/**

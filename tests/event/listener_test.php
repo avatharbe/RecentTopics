@@ -94,20 +94,32 @@ class listener_test extends \phpbb_test_case
 	{
 		return array(
 			'rt_page' => array(
-				array(1, 'app'),
-				array('session_page' => 'app.php/rt'),
+				array(1, 'index'),
+				array('session_page' => 'index.php/rt'),
+				'VIEWING_RECENT_TOPICS',
+				'avathar_recenttopics_page',
+			),
+			'rt_page_query' => array(
+				array(1, 'index'),
+				array('session_page' => 'index.php/rt?start=10'),
 				'VIEWING_RECENT_TOPICS',
 				'avathar_recenttopics_page',
 			),
 			'rt_simple' => array(
-				array(1, 'app'),
-				array('session_page' => 'app.php/rt/simple'),
+				array(1, 'index'),
+				array('session_page' => 'index.php/rt/simple'),
 				'VIEWING_RECENT_TOPICS',
 				'avathar_recenttopics_simple',
 			),
 			'other_page' => array(
-				array(1, 'app'),
-				array('session_page' => 'app.php/other'),
+				array(1, 'index'),
+				array('session_page' => 'index.php/other'),
+				null,
+				null,
+			),
+			'other_route_starting_with_rt' => array(
+				array(1, 'index'),
+				array('session_page' => 'index.php/rtfoo'),
 				null,
 				null,
 			),

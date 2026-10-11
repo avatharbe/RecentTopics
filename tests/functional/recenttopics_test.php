@@ -20,7 +20,7 @@ class recenttopics_test extends \phpbb_functional_test_case
 	}
 
 	// -----------------------------------------------------------------------
-	// Standalone page tests  (app.php/rt and app.php/rt/simple)
+	// Standalone page tests  (index.php/rt and index.php/rt/simple)
 	// -----------------------------------------------------------------------
 
 	/**
@@ -34,7 +34,7 @@ class recenttopics_test extends \phpbb_functional_test_case
 		// Enable the RT page
 		$this->set_config('rt_page_enable', 1);
 
-		$crawler = self::request('GET', 'app.php/rt?sid=' . $this->sid);
+		$crawler = self::request('GET', 'index.php/rt?sid=' . $this->sid);
 
 		// The anchor is static in recent_topics_page.html — always present
 		$this->assertGreaterThanOrEqual(1, $crawler->filter('a#recent-topics')->count(),
@@ -54,7 +54,7 @@ class recenttopics_test extends \phpbb_functional_test_case
 		$this->login();
 		$this->set_config('rt_page_enable', 1);
 
-		$crawler = self::request('GET', 'app.php/rt/simple?sid=' . $this->sid);
+		$crawler = self::request('GET', 'index.php/rt/simple?sid=' . $this->sid);
 
 		// The anchor is static in recent_topics_simple.html — always present
 		$this->assertGreaterThanOrEqual(1, $crawler->filter('a#recent-topics')->count(),
@@ -73,7 +73,7 @@ class recenttopics_test extends \phpbb_functional_test_case
 		// Disable the RT page — should still render but without topics
 		$this->set_config('rt_page_enable', 0);
 
-		$crawler = self::request('GET', 'app.php/rt?sid=' . $this->sid);
+		$crawler = self::request('GET', 'index.php/rt?sid=' . $this->sid);
 
 		// The static anchor is still in the template
 		$this->assertGreaterThanOrEqual(1, $crawler->filter('a#recent-topics')->count(),
@@ -208,7 +208,7 @@ class recenttopics_test extends \phpbb_functional_test_case
 		$this->assertStringEndsWith('ext/avathar/recenttopics/adm/style/images/become_a_patron_button.png', $src);
 
 		self::request('GET', 'ext/avathar/recenttopics/adm/style/images/become_a_patron_button.png', array(), false);
-		$this->assertSame(200, self::$client->getResponse()->getStatus());
+		$this->assertSame(200, self::$client->getResponse()->getStatusCode());
 	}
 
 	/**

@@ -21,7 +21,7 @@ use avathar\recenttopics\core\recenttopics;
  * Controller for the standalone Recent Topics pages.
  *
  * Serves the two routes that show the list on a page of its own rather than as a block on the index
- * or a forum: the full page at app.php/rt, and a chrome-less variant at app.php/rt/simple meant to be
+ * or a forum: the full page at index.php/rt, and a chrome-less variant at index.php/rt/simple meant to be
  * embedded in an iframe. Both delegate the actual list to the recenttopics service and render nothing
  * but the surrounding page when the rt_page_enable setting is off.
  */
@@ -73,7 +73,7 @@ class page_controller implements page_interface
 	}
 
 	/**
-	 * Display the page app.php/rt/ (full header/footer)
+	 * Display the page index.php/rt/ (full header/footer)
 	 *
 	 * @return \Symfony\Component\HttpFoundation\Response A Symfony Response object
 	 */
@@ -83,7 +83,7 @@ class page_controller implements page_interface
 	}
 
 	/**
-	 * Display the page app.php/rt/simple (no header/footer, for iframe embedding)
+	 * Display the page index.php/rt/simple (no header/footer, for iframe embedding)
 	 * Forces PBWoW3 style if installed, otherwise uses the board default.
 	 *
 	 * @return \Symfony\Component\HttpFoundation\Response A Symfony Response object

@@ -22,7 +22,7 @@ Because phpBB extensions have many moving parts: listeners, controllers, databas
 A mock is a stand-in object. Instead of using the real `$auth` service (which requires a full phpBB setup), the test creates a fake one that returns `true` when asked `acl_get('u_rt_view')`. This lets the test stay focused on the class being tested, not on all its dependencies.
 
 **What is a data provider?**
-A data provider is a method that returns a table of inputs and expected outputs. PHPUnit runs the test once per row. For example, `viewonline_data()` returns four rows (the RT page, the simple page, some other app page, a non-app page). The test `test_viewonline_overwrite_location` runs four times — once for each row — with a one-line description telling you which case failed.
+A data provider is a method that returns a table of inputs and expected outputs. PHPUnit runs the test once per row. For example, `viewonline_data()` returns six rows (the RT page, the RT page with a query string, the simple page, some other route, a route that merely starts with `rt`, a non-route page). The test `test_viewonline_overwrite_location` runs six times — once for each row — with a one-line description telling you which case failed.
 
 **What is a ReflectionClass?**
 PHP's `ReflectionClass` lets you reach inside an object and read or call things that are marked `private` or `protected`. Tests use it to check internal state without changing the production code's visibility.
@@ -75,10 +75,12 @@ It creates the listener with mocked dependencies — a `config` object with real
 | `test_getSubscribedEvents` | Verifies the listener registers exactly the 7 expected phpBB events | Any event subscription that was accidentally removed or renamed stops working silently — this is the canary |
 | `test_display_rt_enabled` | `rt_index` config = 1; calls `display_rt()` | `display_recent_topics()` must be called exactly once; if not, the RT block never appears |
 | `test_display_rt_disabled` | `rt_index` config = 0; calls `display_rt()` | `display_recent_topics()` must NOT be called; if it is, the block appears even when the admin turned it off |
-| `test_viewonline_overwrite_location` — `rt_page` | Session page is `app.php/rt` | Location must be set to "Recent Topics" with the correct route URL |
-| `test_viewonline_overwrite_location` — `rt_simple` | Session page is `app.php/rt/simple` | Same as above but for the simple page route |
-| `test_viewonline_overwrite_location` — `other_page` | Session page is some other app route | Location and URL must remain empty — the listener must not match unrelated pages |
-| `test_viewonline_overwrite_location` — `not_app` | Session page is `viewtopic.php` (not an app route) | Same — must not match; wrong matches show incorrect location text to all users |
+| `test_viewonline_overwrite_location` — `rt_page` | Session page is `index.php/rt` | Location must be set to "Recent Topics" with the correct route URL |
+| `test_viewonline_overwrite_location` — `rt_page_query` | Session page is `index.php/rt?start=10` (a later page of the list) | Same as `rt_page`; the query string must not stop the match |
+| `test_viewonline_overwrite_location` — `rt_simple` | Session page is `index.php/rt/simple` | Same as above but for the simple page route |
+| `test_viewonline_overwrite_location` — `other_page` | Session page is some other route (`index.php/other`) | Location and URL must remain empty — the listener must not match unrelated pages |
+| `test_viewonline_overwrite_location` — `other_route_starting_with_rt` | Session page is `index.php/rtfoo` | Must not match; only `rt` as a whole path segment is the Recent Topics page |
+| `test_viewonline_overwrite_location` — `not_app` | Session page is `viewtopic.php` (not a route) | Same — must not match; wrong matches show incorrect location text to all users |
 | `test_acp_manage_forums_request_data` | Admin saves forum settings with checkbox = 0 | `forum_data['forum_recent_topics']` must be set to 0; if missing, the per-forum exclusion never saves |
 | `test_acp_manage_forums_initialise_data_add` | Action is 'add' (creating a new forum) | Default must be set to `'1'` (included); new forums should appear in RT by default |
 | `test_acp_manage_forums_initialise_data_edit` | Action is 'edit' (editing an existing forum) | Default must NOT be set; the edit form reads its value from the database, not from a hard-coded default |
@@ -220,7 +222,7 @@ It runs `fill_template()` for one topic with a stand-in Post Love service that r
 ## 8. Who Is Online label (`language/viewonline_lang_test.php`)
 
 **What this code does:**
-When someone is on `/app.php/rt` or `/app.php/rt/simple`, the listener sets their Who Is Online location to `VIEWING_RECENT_TOPICS` and the link to the page. Core's `viewonline_body.html` wraps that label in its own `<a href="{U_FORUM_LOCATION}">`.
+When someone is on `/index.php/rt` or `/index.php/rt/simple`, the listener sets their Who Is Online location to `VIEWING_RECENT_TOPICS` and the link to the page. Core's `viewonline_body.html` wraps that label in its own `<a href="{U_FORUM_LOCATION}">`.
 
 **What this test file does:**
 It loads `recenttopics.php` from every language pack and checks that `VIEWING_RECENT_TOPICS` is plain text: no HTML and no `%` placeholder.
@@ -293,9 +295,9 @@ Logs in as the admin account, optionally creates topics or changes config values
 
 | Test | Scenario | What is checked |
 |------|----------|----------------|
-| `test_rt_page` | `rt_page_enable` = 1; GET `/app.php/rt` | `<a id="recent-topics">` is present; `<title>` contains "Recent Topics" |
-| `test_rt_simple_page` | `rt_page_enable` = 1; GET `/app.php/rt/simple` | `<a id="recent-topics">` is present |
-| `test_rt_page_disabled` | `rt_page_enable` = 0; GET `/app.php/rt` | Page still loads (no 500 error); `<a id="recent-topics">` is present; `#recent-topics-box` must NOT appear |
+| `test_rt_page` | `rt_page_enable` = 1; GET `/index.php/rt` | `<a id="recent-topics">` is present; `<title>` contains "Recent Topics" |
+| `test_rt_simple_page` | `rt_page_enable` = 1; GET `/index.php/rt/simple` | `<a id="recent-topics">` is present |
+| `test_rt_page_disabled` | `rt_page_enable` = 0; GET `/index.php/rt` | Page still loads (no 500 error); `<a id="recent-topics">` is present; `#recent-topics-box` must NOT appear |
 | `test_index_has_recent_topics` | `rt_index` = 1; create a topic; GET `index.php` | `<a id="recent-topics">` is present; `#recent-topics-box` contains the created topic title |
 | `test_acp_patreon_button_is_local` | Logged in as admin; GET the Recent Topics ACP page | The Patreon button's `src` is the bundled image, not `patreon.com`, and that image URL returns 200 (#200) |
 | `test_announcements_first_on_index` | `rt_announcements_first` = 1; create an announcement, then a newer normal topic; GET `index.php` | The announcement is listed above the newer normal topic in `#recent-topics-box` (#201) |

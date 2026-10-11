@@ -14,6 +14,9 @@
   - [CHANGE] Side view: the topic icon is centred on the title so it no longer covers the last post line
   - [CHANGE] Minimum versions raised to phpBB 4.0 and PHP 8.2
 
+  Fixes
+  - [FIX] Who Is Online shows "Viewing Recent Topics" again for members on the standalone pages. phpBB 4.0 serves routes through `index.php` (`/index.php/rt`, `/index.php/rt/simple`), and the listener only recognised `app.php` session pages, so they were listed as the index page
+
 - 3.0.12 (04/10/2026) — bugfix release
 
   Upgrading: disable the extension, replace the files, enable it again. Enabling runs the 3.0.12 migration; a plain file swap does not.

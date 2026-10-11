@@ -18,7 +18,7 @@ Originally based on NV Recent Topics by Joas Schilling ([nickvergessen](https://
 
 #### Features
 - Recent (or unread) topics list on the index page and viewforum page
-- Standalone pages at `/app.php/rt` (full) and `/app.php/rt/simple` (for iframe embedding)
+- Standalone pages at `/index.php/rt` (full) and `/index.php/rt/simple` (for iframe embedding)
 - Three display locations: Top, Bottom or Side
 - User-overridable preferences via UCP (enable/disable, location, count, sort order, unread only)
 - Six granular user permissions
